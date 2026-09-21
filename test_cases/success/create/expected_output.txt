@@ -1,1 +1,4 @@
-
+Username: newuser
+Status: SUCCESS
+Message: Created new user account successfully!
+Account Created: Yes
