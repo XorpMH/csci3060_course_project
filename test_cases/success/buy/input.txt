@@ -1,1 +1,3 @@
-
+username: existinguser
+buy: Newgame
+seller: sellername
