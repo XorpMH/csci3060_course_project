@@ -1,1 +1,4 @@
-
+Username: existinguser
+Status: SUCCESS
+Message: Logged in to account.
+Logged in: Yes
