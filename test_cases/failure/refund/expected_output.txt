@@ -1,1 +1,5 @@
-
+Buyer: existinguser
+Seller: notseller
+Status: FAILURE
+Message: Seller is not a current user.
+Transaction Completed: No
