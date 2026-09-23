@@ -1,1 +1,3 @@
-
+Game: 
+STATUS: FAILURE
+Message: Content selection is empty. No content can be purchased.
