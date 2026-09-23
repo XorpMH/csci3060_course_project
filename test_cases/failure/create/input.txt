@@ -1,1 +1,3 @@
-
+username: existinguser
+password: 123456789
+email: newuser@gmail.com
