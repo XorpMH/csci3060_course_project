@@ -1,1 +1,5 @@
-
+Username: adminuser
+Target: newuser
+Status: SUCCESS
+Message: Successfully deleted account.
+Account Deleted: Yes
