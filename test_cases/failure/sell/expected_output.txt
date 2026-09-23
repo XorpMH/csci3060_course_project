@@ -1,1 +1,4 @@
-
+Username: existinguser
+Status: FAILURE
+Message: Buy-standard user is not allowed to sell games.
+Transaction Completed: No
