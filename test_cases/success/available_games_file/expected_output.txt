@@ -1,1 +1,4 @@
-
+Status: SUCCESS
+Message: Available Games File is read successfully.
+Games Loaded: gamename
+File Format Valid: Yes
