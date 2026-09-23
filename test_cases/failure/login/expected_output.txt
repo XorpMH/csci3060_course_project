@@ -1,4 +1,4 @@
 Username: nouserwiththisname
-Status: SUCCESS
+Status: FAILURE
 Message: Failed to log in to account.
 Logged in: No
