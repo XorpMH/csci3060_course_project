@@ -1,1 +1,3 @@
-
+Status: SUCCESS
+Message: Logged out of account.
+Logged in: No
