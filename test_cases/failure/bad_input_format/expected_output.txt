@@ -1,1 +1,6 @@
-
+Username: existinguser
+Status: FAILURE
+Game: gamename2
+Price: Invalid
+Transaction Completed: No
+Message: Transaction for gamename2 could not be completed as price format for content is invalid.
