@@ -1,1 +1,5 @@
-
+Account: admin
+Credit Added: 1000.01
+Status: FAILURE
+Message: Maximum credit addition per session is $1000.00.
+Transaction Completed: No
