@@ -1,1 +1,4 @@
-
+Username: existinguser
+Status: FAILURE
+Message: User account name already exists.
+Account Created: No
