@@ -1,1 +1,4 @@
-
+Username: existinguser
+Status: FAILURE
+Message: Insufficient credit.
+Transaction Completed: No
