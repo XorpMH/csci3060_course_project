@@ -1,3 +1,3 @@
-Game: game_name
+Game: gamename
 STATUS: FAILURE
 Message: game_name is already in user_accounts_file. Content cannot be re-purchased.
