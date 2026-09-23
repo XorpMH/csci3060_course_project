@@ -1,1 +1,3 @@
-
+username: adminuser
+account: admin
+remove: newuser
