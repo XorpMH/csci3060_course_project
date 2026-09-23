@@ -1,1 +1,3 @@
-
+username: adminuser
+account: admin
+addcredit: 1000.01
