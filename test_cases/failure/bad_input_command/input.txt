@@ -1,1 +1,2 @@
-
+purchase:game_name 
+purchase:game_name
