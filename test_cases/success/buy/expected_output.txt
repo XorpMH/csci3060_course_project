@@ -1,4 +1,4 @@
-Username: existinguer
+Username: existinguser
 Status: SUCCESS
 Game: gamename
 Seller: sellername
