@@ -1,3 +1,7 @@
-username: existinguser
-account: user
+account: existinguser
+username: newuser
+password: 123456789
+email: newuser@gmailcom
+type: admin
+create: 0
 create
