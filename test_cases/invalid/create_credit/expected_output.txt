@@ -1,1 +1,2 @@
-
+Status: FAILURE
+Message: Account credit cannot exceed 999999.99.
