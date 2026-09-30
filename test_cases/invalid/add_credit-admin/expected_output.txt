@@ -1,3 +1,4 @@
-logged in user: adminuser
-username: existinguser
-addcredit: 100.00
+Username: existinguser
+Credit Added: 100.00
+Status: SUCCESS
+Transaction Completed: Yes
