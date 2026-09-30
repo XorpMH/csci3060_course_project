@@ -1,1 +1,6 @@
-gamename           _sellername    _ 20.00
+Status: SUCCESS
+Message: Available Games File is read successfully.
+Game Name: gamename
+Seller: sellername
+Price: 25.00
+File Format Valid: Yes
