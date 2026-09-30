@@ -1,1 +1,4 @@
-
+Game: NotExistGame
+Status: FAILURE
+Message: Game does not exist.
+Transaction Completed: No
