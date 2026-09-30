@@ -1,1 +1,2 @@
-
+Status: FAILURE
+Message: Only admin users can create accounts.
