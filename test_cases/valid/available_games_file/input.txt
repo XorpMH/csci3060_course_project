@@ -1,2 +1,1 @@
-gamename                 sellername         20.00
-END
+gamename            selleruser     025.00
