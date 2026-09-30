@@ -1,1 +1,5 @@
-
+transaction: buy
+game name: gamename
+seller username: selleruser
+buyer username: existinguser
+price: 25.00
