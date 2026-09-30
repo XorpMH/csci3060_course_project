@@ -1,1 +1,5 @@
-
+Game: gamename
+Price: 1000.00
+Status: FAILURE
+Message: Game price exceeds the maximum allowed price of $999.99.
+Transaction Completed: No
