@@ -1,1 +1,1 @@
-03_selleruser    _ 25.00
+03_sellername    _ 25.00
