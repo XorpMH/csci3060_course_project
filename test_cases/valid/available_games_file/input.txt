@@ -1,1 +1,1 @@
-gamename            selleruser     025.00
+gamename            sellername     025.00
