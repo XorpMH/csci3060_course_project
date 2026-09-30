@@ -1,1 +1,4 @@
-
+Game: gamename
+Status: FAILURE
+Message: No further transactions are allowed on a newly listed game until the next session.
+Transaction Completed: No
