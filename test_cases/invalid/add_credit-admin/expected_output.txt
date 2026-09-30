@@ -1,1 +1,3 @@
-
+logged in user: adminuser
+username: existinguser
+addcredit: 100.00
