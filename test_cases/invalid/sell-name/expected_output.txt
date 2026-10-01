@@ -1,0 +1,5 @@
+Game: gamenamewaytooverylongname
+Price: 25.00
+Status: FAILURE
+Message: Game name exceeds 25 characters.
+Transaction Completed: No
