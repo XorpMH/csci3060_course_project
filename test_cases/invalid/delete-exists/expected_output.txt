@@ -1,4 +1,4 @@
-Username: existinguser
+Username: adminuser
 Target: nonexistentuser
 Status: FAILURE
 Message: Account was not deleted as it does not exist.
