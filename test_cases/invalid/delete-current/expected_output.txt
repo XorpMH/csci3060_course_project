@@ -1,1 +1,5 @@
-
+Username: adminuser
+Target: adminuser
+Status: FAILURE
+Message: Account was not deleted as it is the current user's account.
+Account Deleted: No
