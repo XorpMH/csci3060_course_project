@@ -1,1 +1,2 @@
-
+Status: FAILURE
+Message: User already owns this game.
