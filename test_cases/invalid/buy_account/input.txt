@@ -1,4 +1,0 @@
-account: existinguser
-game: gamename
-seller: sellername
-buy
