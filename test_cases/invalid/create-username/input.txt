@@ -1,0 +1,7 @@
+account: admin
+username: verylongusername
+password: 123456789
+email: newuser@gmail.com
+type: admin
+credit: 0
+create
