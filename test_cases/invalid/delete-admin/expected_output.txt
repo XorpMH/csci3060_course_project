@@ -1,1 +1,2 @@
-
+Status: FAILURE
+Message: Current user cannot delete their own account.
