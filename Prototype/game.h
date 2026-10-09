@@ -3,9 +3,9 @@
 #include <string>
 class Game {
 private:
-    std::string gamename;
-    std::string gamedescription;
-    double gameprice;
+    std::string game_name;
+    std::string game_description;
+    double game_price;
 public:
     Game(std::string gamename, std::string gamedescription, double gameprice);
     std::string getGameName() const;
