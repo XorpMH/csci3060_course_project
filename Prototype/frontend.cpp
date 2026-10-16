@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <fstream>
+#include <tuple>
 #include "game.h"
 #include "user.h"
 
@@ -12,6 +13,18 @@ bool running = true;
 // Whether the user is currently logged in or not
 // TODO: replace with a check using the user class?
 bool logged_in = false;
+
+std::vector<User> users = {
+    User("adminuser", "AA", 500.00),
+    User("existinguser", "FS", 100.00)
+};
+
+std::string current_username;
+std::string current_user_type;
+
+void loginMenu();
+void browseMenu();
+bool login(const std::string& username);
 
 // Main browsing loop
 int main(){
@@ -26,10 +39,64 @@ int main(){
 }
 
 void loginMenu(){
-    //TODO: Show text and receive user input
+    std::string command;
+
+    std::cout << "\nLogged in as: " << current_username << "\n";
+    std::cout << "Enter command: ";
+    std::getline(std::cin, command);
+
+    if(command == "logout"){
+        logged_in = false;
+        current_username = "";
+        current_user_type = "";
+
+        std::cout << "Logout successful\n";
+    }
+    else{
+        std::cout << "Invalid command\n";
+    }
 }
 
 void browseMenu(){
+    std::string command;
+
+    std::cout << "Enter command: ";
+    std::getline(std::cin, command);
+
+    if(command == "login"){
+        std::string username;
+
+        std::cout << "Enter username: ";
+        std::getline(std::cin, username);
+
+        login(username);
+    }
+    else{
+        std::cout << "Invalid command\n";
+    }
+}
+
+bool login(const std::string& username){
+    if(logged_in){
+        std::cout << "Login failed: user is already logged in\n";
+        return false;
+    }
+
+    for(const User& user : users){
+        if(user.getUsername() == username){
+            logged_in = true;
+            current_username = user.getUsername();
+            current_user_type = user.getUserType();
+
+            std::cout << "Login successful\n";
+            return true;
+        }
+    }
+
+    std::cout << "Login failed: user does not exist\n";
+    return false;
+}
+
     //TODO: Show text and receive user input
     std::cout << "===MENU===" << std::endl;
     std::cout << "1. Logout" << std::endl;
