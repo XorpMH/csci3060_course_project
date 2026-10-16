@@ -60,8 +60,9 @@ std::tuple<std::unordered_map<std::string, std::string>, std::string> readFile(s
     return {value_map, command};
 }
 
-void writeFile(){
+void writeFile(std::string file_path){
     //TODO: Write to the file output location in the format of the test cases
+    
 }
 
 void loginMenu(){
