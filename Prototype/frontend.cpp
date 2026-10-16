@@ -58,45 +58,6 @@ void loginMenu(){
 }
 
 void browseMenu(){
-    std::string command;
-
-    std::cout << "Enter command: ";
-    std::getline(std::cin, command);
-
-    if(command == "login"){
-        std::string username;
-
-        std::cout << "Enter username: ";
-        std::getline(std::cin, username);
-
-        login(username);
-    }
-    else{
-        std::cout << "Invalid command\n";
-    }
-}
-
-bool login(const std::string& username){
-    if(logged_in){
-        std::cout << "Login failed: user is already logged in\n";
-        return false;
-    }
-
-    for(const User& user : users){
-        if(user.getUsername() == username){
-            logged_in = true;
-            current_username = user.getUsername();
-            current_user_type = user.getUserType();
-
-            std::cout << "Login successful\n";
-            return true;
-        }
-    }
-
-    std::cout << "Login failed: user does not exist\n";
-    return false;
-}
-
     //TODO: Show text and receive user input
     std::cout << "===MENU===" << std::endl;
     std::cout << "1. Logout" << std::endl;
