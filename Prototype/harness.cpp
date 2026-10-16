@@ -8,7 +8,6 @@
 // Input harness
 // Using filepath, returns a tuple containing the variables as key-value pairings, and the desired command as a string
 std::tuple<std::unordered_map<std::string, std::string>, std::string> readFile(std::string file_path){
-
     // Return variables, empty if file isn't accessed
     std::unordered_map<std::string, std::string> value_map;
     std::string command;
@@ -40,20 +39,23 @@ std::tuple<std::unordered_map<std::string, std::string>, std::string> readFile(s
     return {value_map, command};
 }
 
+// Output Harness
 // Write the status of the output
 void writeFile(std::string file_path, std::string status){
-    
     // Open file
     std::ofstream file(file_path);
 
     // Write to file if open
     if(file.is_open()){
+        // Write status
         file << "STATUS: " << status;
 
+        // Close file
         file.close();
     }
 }
 
+// Output Harness
 // Overload: Write the status of the output
 void writeFile(std::string file_path, std::string status, std::unordered_map<std::string, std::string> outputs){
     // Open file
@@ -62,12 +64,15 @@ void writeFile(std::string file_path, std::string status, std::unordered_map<std
     // Write to file if open
     if(file.is_open()){
 
+        // Write all output pairings
         for(const auto& [key, value] : outputs){
             file << key << ": " << outputs[key];
         }
 
+        // Write status
         file << "STATUS: " << status;
 
+        // Close file
         file.close();
     }
 }
