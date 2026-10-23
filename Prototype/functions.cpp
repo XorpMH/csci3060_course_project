@@ -1,1 +1,2 @@
-// SETUP FUNCTIONS.CPP
+#include "user.h"
+#include "game.h"
