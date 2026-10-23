@@ -6,6 +6,7 @@
 #include <tuple>
 #include "game.h"
 #include "user.h"
+#include "functions.h"
 
 // Boolean controlling the main loop when browsing
 bool running = true;
@@ -139,6 +140,3 @@ bool login(const std::string& username){
     std::cout << "Login failed: user does not exist\n";
     return false;
 }
-
-// TODO: Implement logout function in a separate file.
-void logout(){}
