@@ -2,6 +2,7 @@
 #include "game.h"
 #include "functions.h"
 #include <iostream>
+#include <vector>
 
 // Logout function
 void logout(bool& logged_in,
@@ -12,4 +13,14 @@ void logout(bool& logged_in,
     current_user_type = "";
 
     std::cout << "Logout successful\n";
+}
+
+// listAccounts function
+void listAccounts(const std::vector<User>& users) {
+  for (const User& user : users) {
+    std::cout << "Username: " << user.getUsername() 
+    << ", Type: " << user.getUserType() 
+    << ", Credit: $" << user.getCredit() 
+    << std::endl;
+  }
 }
