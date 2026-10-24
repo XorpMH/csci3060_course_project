@@ -17,10 +17,16 @@ void logout(bool& logged_in,
 
 // listAccounts function
 void listAccounts(const std::vector<User>& users) {
-  for (const User& user : users) {
-    std::cout << "Username: " << user.getUsername() 
-    << ", Type: " << user.getUserType() 
-    << ", Credit: $" << user.getCredit() 
-    << std::endl;
-  }
+
+    if (users.empty()) {
+        std::cout << "No accounts found." << std::endl;
+        return;
+    }
+
+    for (const User& user : users) {
+        std::cout << "Username: " << user.getUsername()
+                  << ", Type: " << user.getUserType()
+                  << ", Credit: $" << user.getCredit()
+                  << std::endl;
+    }
 }

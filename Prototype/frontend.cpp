@@ -107,9 +107,9 @@ void browseMenu(){
                 break;
 
         case 9:
-        std::cout << "List accounts selected..." << std::endl;
-                break;
-                
+        listAccounts(users);
+            break;
+
         default:
         std::cout << "Invalid input, please select an option from 1 to 9 and try again..." << std::endl;
             break;
