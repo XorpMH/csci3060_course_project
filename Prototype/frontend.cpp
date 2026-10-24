@@ -47,14 +47,10 @@ void loginMenu(){
     std::getline(std::cin, command);
 
     if(command == "logout"){
-        logged_in = false;
-        current_username = "";
-        current_user_type = "";
-
-        std::cout << "Logout successful\n";
+        logout(logged_in, current_username, current_user_type);
     }
     else{
-        std::cout << "Invalid command\n";
+        std::cout << "Invalid command. Please try again.\n";
     }
 }
 
