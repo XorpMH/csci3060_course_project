@@ -37,37 +37,55 @@ void listAccounts(const std::vector<User> users) {
 }
 
 // Create a new user account
-User* createUser(User curUser, // The user executing the command
-        const std::vector<User> users, // The existing user list
+bool createUser(User current_user, // The user executing the command
+        std::vector<User>* users, // Existing user list, passed by reference
         std::string username, 
         std::string password, 
         std::string email, 
         std::string type){
     
     // Confirm that the current user is an admin
-    if(!(curUser.getUserType()=="admin")){
-        return nullptr;
+    if(!(current_user.getUserType()=="admin")){
+        return false;
     }
     
     // Check that the user being created has a unique username
-    for(User u : users){
-        if(u.getUsername()==username){
-            return nullptr;
+    for(auto it = users->begin(); it != users->end(); it++){
+        if(it->getUsername()==username){
+            return false;
         }
     }
 
     // Check email, password, and user type format
     if(!passwordValid || !emailValid || !typeValid){
-        return nullptr;
+        return false;
     }
 
-    //Create and return the user
-    return &User(username, type, email, password);
+    // Create the user
+    users->push_back(User(username, type, email, password));
+    return true;
 }
 
 // Remove an existing user
-void deleteUser(){
+bool deleteUser(User current_user, // The user executing the command
+        std::vector<User>* users,  // Existing user list, passed by reference
+        std::string username // The username of the user to delete
+    ){
+    
+    // Confirm that the current user is an admin
+    if(!(current_user.getUserType()=="admin")){
+        return false;
+    }
+    
+    // Find and remove the user from the list
+    for(auto it = users->begin(); it != users->end(); it++){
+        if(it->getUsername()==username){
+            users->erase(it);
+            return true;
+        }
+    }
 
+    return false;
 }
 
 // Put a game up for sale
