@@ -3,6 +3,8 @@
 #include "functions.h"
 #include <iostream>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 // Log in to an existing user account
 void login(){
@@ -105,7 +107,23 @@ void refund(){
 
 // Build the file from a list of user accounts
 void currentUserAccountsConstructor(){
+    // Open file
+    std::ofstream file("assets/");
 
+    // Write to file if open
+    if(file.is_open()){
+        
+        // Write all output pairings
+        for(const auto& [key, value] : outputs){
+            file << key << ": " << outputs[key];
+        }
+
+        // Write status
+        file << "STATUS: " << status;
+
+        // Close file
+        file.close();
+    }
 }
 
 // Get a list of user accounts from the file
