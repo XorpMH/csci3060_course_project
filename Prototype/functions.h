@@ -2,7 +2,9 @@
 #define FUNCTIONS_H
 
 #include <string>
+#include <vector>
 #include "user.h"
+#include "game.h"
 
 bool login(const std::string& username,
            const std::vector<User>& users,
@@ -14,7 +16,6 @@ bool login(const std::string& username,
 void logout(bool& logged_in,
             std::string& current_username,
             std::string& current_user_type);
-
 void listAccounts(const std::vector<User>& users);
 
 

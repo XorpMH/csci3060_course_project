@@ -3,7 +3,11 @@
 #include <unordered_map>
 #include <iostream>
 #include <fstream>
-#include "frontend.cpp"
+#include <tuple>
+
+#include "user.h"
+#include "game.h"
+#include "functions.h"
 
 // Input harness
 // Using filepath, returns a tuple containing the variables as key-value pairings, and the desired command as a string

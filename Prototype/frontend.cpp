@@ -8,6 +8,7 @@
 #include "user.h"
 #include "functions.h"
 
+
 // Boolean controlling the main loop when browsing
 bool running = true;
 
@@ -27,27 +28,31 @@ void loginMenu();
 void browseMenu();
 bool login(const std::string& username);
 
+
 // Main browsing loop
 int main(){
     while(running){
         if(logged_in){
-            loginMenu();
+            browseMenu();
         }
         else{
-            browseMenu();
+            loginMenu();
         }
     }
 }
-
 void loginMenu(){
     std::string command;
 
-    std::cout << "\nLogged in as: " << current_username << "\n";
     std::cout << "Enter command: ";
     std::getline(std::cin, command);
 
-    if(command == "logout"){
-        logout(logged_in, current_username, current_user_type);
+    if(command == "login"){
+        std::string username;
+
+        std::cout << "Enter username: ";
+        std::getline(std::cin, username);
+
+        login(username);
     }
     else{
         std::cout << "Invalid command. Please try again.\n";
@@ -66,17 +71,17 @@ void browseMenu(){
     std::cout << "7. Add credit" << std::endl;
     std::cout << "8. List transactions" << std::endl;
     std::cout << "9. List accounts" << std::endl;
+    
 
     int input_variable;
     std::cout << "Please select an option: ";
     std::cin >> input_variable;
 
     //TODO: Comment out switch statement and set input variables inside, then distribute load into separate functions
-    switch(input_variable){
+    switch(input_variable){   
         case 1:
-        std::cout << "Logout selected..." << std::endl;
-            // logout(); // TODO: Connect to logout function
-            break;
+        logout(logged_in, current_username, current_user_type);
+        break;
 
         case 2:
         std::cout << "Create account selected..." << std::endl;
@@ -136,3 +141,6 @@ bool login(const std::string& username){
     std::cout << "Login failed: user does not exist\n";
     return false;
 }
+
+
+
