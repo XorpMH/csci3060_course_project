@@ -5,8 +5,8 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
-<<<<<<< HEAD
 // Login function
 bool login(const std::string &username,
            const std::vector<User> &users,
@@ -39,11 +39,6 @@ bool login(const std::string &username,
     // Username was not found
     std::cout << "Login failed: user does not exist\n";
     return false;
-=======
-// Log in to an existing user account
-void login(){
-
->>>>>>> e24558dca05962a3e976b3ba220fafd7fe9644b4
 }
 
 // Logout function
@@ -59,12 +54,7 @@ void logout(bool &logged_in,
 }
 
 // listAccounts function
-<<<<<<< HEAD
-void listAccounts(const std::vector<User> &users)
-{
-=======
 void listAccounts(const std::vector<User> users) {
->>>>>>> e24558dca05962a3e976b3ba220fafd7fe9644b4
 
     if (users.empty())
     {
@@ -72,12 +62,8 @@ void listAccounts(const std::vector<User> users) {
         return;
     }
 
-<<<<<<< HEAD
     for (const User &user : users)
     {
-=======
-    for (const User user : users) {
->>>>>>> e24558dca05962a3e976b3ba220fafd7fe9644b4
         std::cout << "Username: " << user.getUsername()
                   << ", Type: " << user.getUserType()
                   << ", Credit: $" << user.getCredit()
@@ -94,7 +80,7 @@ bool createUser(User current_user, // The user executing the command
         std::string type){
     
     // Confirm that the current user is an admin
-    if(!(current_user.getUserType()=="admin")){
+    if(!(current_user.getUserType()=="AA")){
         return false;
     }
     
@@ -122,7 +108,7 @@ bool deleteUser(User current_user, // The user executing the command
     ){
     
     // Confirm that the current user is an admin
-    if(!(current_user.getUserType()=="admin")){
+    if(!(current_user.getUserType()=="AA")){
         return false;
     }
     
@@ -153,20 +139,38 @@ void refund(){
 }
 
 // Build the file from a list of user accounts
-void currentUserAccountsConstructor(){
+// UUUUUUUUUUUUUUU_TT_CCCCCCCCC
+void currentUserAccountsConstructor(std::vector<User>* users){
     // Open file
-    std::ofstream file("assets/");
+    std::ofstream file("assets/current_user_accounts.txt");
 
     // Write to file if open
     if(file.is_open()){
-        
-        // Write all output pairings
-        for(const auto& [key, value] : outputs){
-            file << key << ": " << outputs[key];
-        }
 
-        // Write status
-        file << "STATUS: " << status;
+        // Write a line for each user
+        for(auto it = users->begin(); it != users->end(); it++){
+            
+            // Write the username, and pad anything shorter than 15 characters
+            file << it->getUsername().append(15 - it->getUsername().length(), ' ');
+            
+            file << "_";
+
+            // Write user type as a 2 letter capitalized string
+            file << it->getUserType();
+
+            file << "_";
+
+            // Write the user's credit, append .00 if it is an integer and write only 2 decimals
+            // TODO
+            if(it->getCredit() == static_cast<int>(it->getCredit())){
+                file << it->getCredit() << ".00";
+            }
+            else{
+                file << std::setprecision(2) << it->getCredit();
+            }
+
+            file << "\n";
+        }
 
         // Close file
         file.close();
