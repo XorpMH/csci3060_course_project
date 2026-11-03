@@ -103,6 +103,36 @@ void refund(){
 
 }
 
+// Build the file from a list of user accounts
+void currentUserAccountsConstructor(){
+
+}
+
+// Get a list of user accounts from the file
+void currentUserAccounts(){
+    std::string file_name = "";
+}
+
+// Build the file from a list of available games
+void availableGamesConstructor(){
+    
+}
+
+// Get a list of games from the file
+void availableGames(){
+    std::string file_name = "";
+}
+
+// Build the file from a list of user accounts
+void gameCollectionConstructor(){
+    
+}
+
+// Get a list of games from the user's file
+void gameCollection(User user){
+
+}
+
 //
 // HELPER FUNCTIONS
 //
