@@ -3,8 +3,8 @@
 #include "functions.h"
 #include <iostream>
 #include <vector>
+#include <cmath>
 
-<<<<<<< HEAD
 // Login function
 bool login(const std::string &username,
            const std::vector<User> &users,
@@ -37,11 +37,6 @@ bool login(const std::string &username,
     // Username was not found
     std::cout << "Login failed: user does not exist\n";
     return false;
-=======
-// Log in to an existing user account
-void login(){
-
->>>>>>> e24558dca05962a3e976b3ba220fafd7fe9644b4
 }
 
 // Logout function
@@ -57,12 +52,8 @@ void logout(bool &logged_in,
 }
 
 // listAccounts function
-<<<<<<< HEAD
 void listAccounts(const std::vector<User> &users)
 {
-=======
-void listAccounts(const std::vector<User> users) {
->>>>>>> e24558dca05962a3e976b3ba220fafd7fe9644b4
 
     if (users.empty())
     {
@@ -70,12 +61,8 @@ void listAccounts(const std::vector<User> users) {
         return;
     }
 
-<<<<<<< HEAD
     for (const User &user : users)
     {
-=======
-    for (const User user : users) {
->>>>>>> e24558dca05962a3e976b3ba220fafd7fe9644b4
         std::cout << "Username: " << user.getUsername()
                   << ", Type: " << user.getUserType()
                   << ", Credit: $" << user.getCredit()
@@ -135,10 +122,69 @@ bool deleteUser(User current_user, // The user executing the command
     return false;
 }
 
-// Put a game up for sale
-void sell(){
+ // Put a game up for sale
+ // TODO: Write successful sell transaction to daily transaction file.
+ // TODO: Do not make the game available until the next session.
 
+void sell(bool logged_in,
+          const std::string& current_user_type,
+          const std::string& gamename,
+          const std::string& gamedescription,
+          double gameprice,
+          const std::vector<Game>& available_games,
+          std::vector<Game>& pending_games)
+{
+    // Check if the user is logged in
+    if (!logged_in) {
+        std::cout << "Error: User must be logged in to sell a game.\n";
+        return;
+    }
+
+    // Standard-buy accounts cannot sell games
+    if (current_user_type == "BS") {
+        std::cout << "Error: Standard-buy accounts cannot sell games.\n";
+        return;
+    }
+
+    // Check if the game name is valid
+    if (gamename.empty() || gamename.length() > 25) {
+        std::cout << "Error: Game name must be between 1 and 25 characters.\n";
+        return;
+    }
+
+    // Check if the price is valid
+    if (!std::isfinite(gameprice) ||
+        gameprice < 0 || gameprice > 999.99) {
+        std::cout << "Error: Game price must be between $0.00 and $999.99.\n";
+        return;
+    }
+
+    // Check if the game name already exists
+    for (const Game& game : available_games) {
+        if (game.getGameName() == gamename) {
+            std::cout << "Error: Game name already exists.\n";
+            return;
+        }
+    }
+
+    // Check games listed during the current session
+    for (const Game& game : pending_games) {
+        if (game.getGameName() == gamename) {
+            std::cout << "Error: Game name already exists.\n";
+            return;
+        }
+    }
+
+    // Create a new game
+    Game new_game(gamename, gamedescription, gameprice);
+
+    // TODO: Save the sell transaction to the daily transaction file.
+    // Only record the game as pending after the file write succeeds.
+
+    std::cout << "Game passed validation, but the sale "
+              << "has not been saved yet.\n";
 }
+
 
 // Purchase a game that is up for sale
 void buy(){

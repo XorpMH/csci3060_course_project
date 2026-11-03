@@ -3,6 +3,7 @@
 
 #include <string>
 #include "user.h"
+#include "game.h"
 
 bool login(const std::string& username,
            const std::vector<User>& users,
@@ -16,6 +17,15 @@ void logout(bool& logged_in,
             std::string& current_user_type);
 
 void listAccounts(const std::vector<User>& users);
+
+
+void sell(bool logged_in,
+          const std::string& current_user_type,
+          const std::string& gamename,
+          const std::string& gamedescription,
+          double gameprice,
+          const std::vector<Game>& available_games,
+          std::vector<Game>& pending_games);
 
 
 #endif
