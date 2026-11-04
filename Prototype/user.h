@@ -10,7 +10,7 @@ private:
     double credit;
 public:
     User(std::string name, std::string type, std::string email, std::string password);
-    User(std::string name, std::string type, double amount);
+    User(std::string name, std::string type, double amount = 0.0);
     User(std::string name, std::string type);
     std::string getUsername() const;
     std::string getUserType() const;
