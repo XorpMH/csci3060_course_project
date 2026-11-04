@@ -178,8 +178,37 @@ void currentUserAccountsConstructor(std::vector<User>* users){
 }
 
 // Get a list of user accounts from the file
-void currentUserAccounts(){
-    std::string file_name = "";
+std::vector<User> currentUserAccounts(){
+    std::string file_path = "assets/current_user_accounts.txt";
+    std::vector<User> users = {};
+
+    try{
+        // Open file
+        std::ifstream file(file_path);
+
+        // Confirm that filepath exists/file is open
+        if(file.is_open()){
+            
+            // Loop through all lines and add users to the list
+            std::string line;
+            while(std::getline(file, line)){
+                
+                // Get user information from formatted line
+                std::string username = line.substr(0,15);
+                std::string user_type = line.substr(16,2);
+                double credits = std::stod(line.substr(19,9));
+
+                // Add user to list
+                users.push_back(User(username, user_type, credits));
+            }
+
+            // Close file
+            file.close();
+        }
+    }
+    catch(...){}
+
+    return users;
 }
 
 // Build the file from a list of available games
