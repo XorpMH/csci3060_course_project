@@ -454,6 +454,15 @@ void dailyTransactionsConstructor(){
 // Apply individual transactions from the daily transactions file
 void applyDailyTransactions(){
     // TODO: take the transactions from the daily transactions file and apply them to the data files
+    // TODO: for loop that goes through all transaction and uses applyTransaction on each of them
+}
+
+// Apply a single transaction
+std::string applyTransaction(){
+    // TODO: call the corresponding transaction function and update the data files
+    // TODO: return a string of the resulting output
+
+    return "";
 }
 
 //
