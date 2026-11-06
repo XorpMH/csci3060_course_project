@@ -333,11 +333,22 @@ std::vector<Game> availableGames(){
 
 // Build the file from a list of user accounts
 void gameCollectionConstructor(){
-    
+
 }
 
 // Get a list of games from the user's file
 void gameCollection(User user){
+    std::string file_path = "";
+
+}
+
+// Create the daily transactions file at logout
+void dailyTransactionsConstructor(){
+
+}
+
+//
+void applyDailyTransactions(){
 
 }
 
