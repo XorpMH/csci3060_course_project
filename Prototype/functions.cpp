@@ -447,20 +447,20 @@ std::vector<Game> gameCollection(const std::vector<Game>& available_games, User 
 }
 
 // Create the daily transactions file at logout
-void dailyTransactionsConstructor(){
+void dailyTransactionsConstructor(std::vector<std::string> transactions){
     // TODO: take a list of transactions and write them to a single file line by line, named "daily_transaction_date_time.txt"
 }
 
 // Apply individual transactions from the daily transactions file
-void applyDailyTransactions(){
+void applyDailyTransactions(std::vector<std::string> transactions){
     // TODO: take the transactions from the daily transactions file and apply them to the data files
     // TODO: for loop that goes through all transaction and uses applyTransaction on each of them
 }
 
 // Apply a single transaction
-std::string applyTransaction(){
+std::string applyTransaction(std::string transaction){
     // TODO: call the corresponding transaction function and update the data files
-    // TODO: return a string of the resulting output
+    // TODO: return a string of the resulting output, this is for the testing suite
 
     return "";
 }
