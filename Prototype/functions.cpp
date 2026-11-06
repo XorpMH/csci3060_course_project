@@ -209,8 +209,8 @@ void currentUserAccountsConstructor(std::vector<User>* users){
         // Write a line for each user
         for(auto it = users->begin(); it != users->end(); it++){
             
-            // Write the username, and pad anything shorter than 15 characters
-            file << it->getUsername().append(15 - it->getUsername().length(), ' ');
+            // Write the username and pad anything shorter than 15 characters
+            file << std::left << std::setw(15) << it->getUsername();
             
             file << " ";
 
@@ -220,7 +220,7 @@ void currentUserAccountsConstructor(std::vector<User>* users){
             file << " ";
 
             // Write the user's credit to 2 decimal places
-            file << std::fixed << std::setprecision(2) << it->getCredit();
+            file << std::left << std::setw(9) << std::fixed << std::setprecision(2) << it->getCredit();
 
             file << "\n";
         }
@@ -247,9 +247,9 @@ std::vector<User> currentUserAccounts(){
             while(std::getline(file, line)){
                 
                 // Get user information from formatted line
-                std::string username = line.substr(0,15);
-                std::string user_type = line.substr(16,2);
-                double credits = std::stod(line.substr(19,9));
+                std::string username = rtrim(line.substr(0,15));
+                std::string user_type = rtrim(line.substr(16,2));
+                double credits = std::stod(rtrim(line.substr(19,9)));
 
                 // Add user to list
                 users.push_back(User(username, user_type, credits));
@@ -273,21 +273,21 @@ void availableGamesConstructor(std::vector<Game>* games){
     // Write to file if open
     if(file.is_open()){
 
-        // Write a line for each user
+        // Write a line for each game
         for(auto it = games->begin(); it != games->end(); it++){
             
-            // Write the game name, and pad anything shorter than 19 characters
-            file << it->getGameName().append(19 - it->getGameName().length(), ' ');
+            // Write the game name and pad anything shorter than 19 characters
+            file << std::left << std::setw(19) << it->getGameName();
             
             file << " ";
 
             // Write seller's username and pad anything shorter than 15 characters
-            file << it->getSellerName().append(19 - it->getSellerName().length(), ' ');
+            file << std::left << std::setw(15) << it->getSellerName();
 
             file << " ";
 
             // Write the game price to 2 decimal places
-            file << std::fixed << std::setprecision(2) << it->getGamePrice();
+            file << std::left << std::setw(6) << std::fixed << std::setprecision(2) << it->getGamePrice();
 
             file << "\n";
         }
@@ -314,9 +314,9 @@ std::vector<Game> availableGames(){
             while(std::getline(file, line)){
                 
                 // Get game information from formatted line
-                std::string game_name = line.substr(0,19);
-                std::string seller_name = line.substr(20,15);
-                double price = std::stod(line.substr(36,6));
+                std::string game_name = rtrim(line.substr(0,19));
+                std::string seller_name = rtrim(line.substr(20,15));
+                double price = std::stod(rtrim(line.substr(36,6)));
 
                 // Add game to list
                 games.push_back(Game(game_name, seller_name, price));
@@ -331,20 +331,119 @@ std::vector<Game> availableGames(){
     return games;
 }
 
-// Build the file from a list of user accounts
-void gameCollectionConstructor(){
+// Append to the file containing ownership of games from a game and its owner, or create it if it doesn't exist
+// IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
+void appendGameCollection(Game game, User owner){
+    // Open file to append to it
+    std::ofstream file("assets/game_collection.txt", std::ios::app);
 
+    // Write to file if open
+    if(file.is_open()){
+        
+        // Write the game name and pad anything shorter than 19 characters
+        file << std::left << std::setw(19) << game.getGameName();
+
+        file << " ";
+
+        // Write the owner's name and pad anything shorter than 15 characters
+        file << std::left << std::setw(15) << owner.getUsername();
+
+        file << "\n";
+
+        // Close file
+        file.close();
+    }
 }
 
-// Get a list of games from the user's file
-void gameCollection(User user){
-    std::string file_path = "";
+// Remove a game from a user's ownership
+// IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
+void removeGameCollection(Game game, User owner){
+    std::string file_path = "assets/game_collection.txt";
+    
+    // Open original file
+    std::ifstream inFile(file_path);
+    std::vector<std::string> lines = {};
 
+    // Read all lines from file
+    if(inFile.is_open()){
+        
+        // Loop through all lines and save them to the list
+        std::string line;
+        while(std::getline(inFile, line)){
+            
+            // Add line to list 
+            lines.push_back(line);
+        }
+
+        // Close original file
+        inFile.close();
+    }
+
+    // Open overwrite file
+    std::ofstream outFile(file_path);
+
+    // Write to file if open
+    if(outFile.is_open()){
+        
+        // Find the line to remove
+        for(int i = 0; i < lines.size(); i++){
+            
+            // Construct game name and username
+            std::string game_name = rtrim(lines[i].substr(0,19));
+            std::string username = rtrim(lines[i].substr(20,15));
+
+            // Write everything except the ownership to remove
+            if(game.getGameName() == game_name && owner.getUsername() == username){
+                // Do nothing
+            }
+            else{
+                outFile << lines[i] << "\n";
+            }
+        }
+
+        // Close file
+        outFile.close();
+    }
+}
+
+// Get a list of owned games owned by a specific user
+std::vector<Game> gameCollection(const std::vector<Game>& available_games, User owner){
+    std::vector<Game> games = {};
+
+    // Open file
+    std::ifstream file("assets/game_collection.txt");
+
+    // Read all lines from file
+    if(file.is_open()){
+        
+        // Loop through all lines and save them to the list
+        std::string line;
+        while(std::getline(file, line)){
+            
+            // Construct game name and username
+            std::string game_name = rtrim(line.substr(0,19));
+            std::string username = rtrim(line.substr(20,15));
+
+            // Check if the game exists and is owner by the user
+            for(int i = 0; i < available_games.size(); i++){
+                if(available_games[i].getGameName() == game_name && owner.getUsername() == username){
+                    // Add the game to the vector
+                    games.push_back(available_games[i]);
+                    break;
+                }
+            }
+        }
+
+        // Close file
+        file.close();
+    }
+
+    return games;
 }
 
 // Create the daily transactions file at logout
 void dailyTransactionsConstructor(){
-
+    
 }
 
 //
@@ -369,4 +468,12 @@ bool emailValid(std::string email){
 // Requirements for a valid user type
 bool typeValid(std::string type){
     return true;
+}
+
+// Trim right
+std::string rtrim(std::string& s){
+    // Line taken from stack overflow https://stackoverflow.com/questions/216823/how-can-i-trim-a-stdstring
+    s.erase(s.find_last_not_of(" \n\r\t") + 1);
+    
+    return s;
 }
