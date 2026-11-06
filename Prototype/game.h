@@ -17,6 +17,7 @@ public:
     /// @name Constructor
     /// @{
     Game(std::string game_name, std::string seller_name, std::string game_description, double game_price);
+    Game(std::string game_name, std::string seller_name, double game_price);
     /// @}
 
     /// @name Getters

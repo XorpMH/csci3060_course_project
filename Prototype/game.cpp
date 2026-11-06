@@ -14,6 +14,12 @@ Game::Game(std::string game_name, std::string seller_name, std::string game_desc
   this->game_price = game_price;
 }
 
+Game::Game(std::string game_name, std::string seller_name, double game_price) {
+  this->game_name = game_name;
+  this->seller_name = seller_name;
+  this->game_price = game_price;
+}
+
 // --- GETTERS ---
 
 std::string Game::getGameName() const {
