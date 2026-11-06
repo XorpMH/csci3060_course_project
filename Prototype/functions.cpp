@@ -479,13 +479,63 @@ std::string applyTransaction(std::string transaction){
 //
 
 // Generically append a line to a file
-void appendFile(){
-    // TODO
+void appendToFile(std::string file_path, std::string line){
+    // Open file to append to it
+    std::ofstream file(file_path, std::ios::app);
+
+    // Write to file if open
+    if(file.is_open()){
+        
+        // Add line to end of file
+        file << line << "\n";
+
+        // Close file
+        file.close();
+    }
 }
 
 // Generically remove a line from a file
-void removeFromFile(){
-    // TODO
+void removeFromFile(std::string file_path, std::string line_to_remove){
+    // Open original file
+    std::ifstream inFile(file_path);
+    std::vector<std::string> lines = {};
+
+    // Read all lines from file
+    if(inFile.is_open()){
+        
+        // Loop through all lines and save them to the list
+        std::string line;
+        while(std::getline(inFile, line)){
+            
+            // Add line to list 
+            lines.push_back(line);
+        }
+
+        // Close original file
+        inFile.close();
+    }
+
+    // Open overwrite file
+    std::ofstream outFile(file_path);
+
+    // Write to file if open
+    if(outFile.is_open()){
+        
+        // Find the line to remove
+        for(int i = 0; i < lines.size(); i++){
+            
+            // Write everything except the line to remove
+            if(lines[i] == line_to_remove){
+                // Do nothing
+            }
+            else{
+                outFile << lines[i] << "\n";
+            }
+        }
+
+        // Close file
+        outFile.close();
+    }
 }
 
 // Requirements for a valid password
