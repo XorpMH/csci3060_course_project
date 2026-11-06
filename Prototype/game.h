@@ -9,18 +9,20 @@
 class Game {
 private:
     std::string game_name;
+    std::string seller_name;
     std::string game_description;
     double game_price;
     
 public:
     /// @name Constructor
     /// @{
-    Game(std::string gamename, std::string gamedescription, double gameprice);
+    Game(std::string game_name, std::string seller_name, std::string game_description, double game_price);
     /// @}
 
     /// @name Getters
     /// @{
     std::string getGameName() const;
+    std::string getSellerName() const;
     std::string getGameDescription() const;
     double getGamePrice() const;
     /// @}
@@ -28,6 +30,7 @@ public:
     /// @name Setters
     /// @{
     std::string setGameName(std::string name);
+    std::string setSellerName(std::string name);
     std::string setGameDescription(std::string description);
     double setGamePrice(double price);
     /// @}

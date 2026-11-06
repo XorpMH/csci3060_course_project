@@ -7,8 +7,9 @@
 
 // --- CONSTRUCTOR ---
 
-Game::Game(std::string game_name, std::string game_description, double game_price) {
+Game::Game(std::string game_name, std::string seller_name, std::string game_description, double game_price) {
   this->game_name = game_name;
+  this->seller_name = seller_name;
   this->game_description = game_description;
   this->game_price = game_price;
 }
@@ -16,6 +17,10 @@ Game::Game(std::string game_name, std::string game_description, double game_pric
 // --- GETTERS ---
 
 std::string Game::getGameName() const {
+  return game_name;
+}
+
+std::string Game::getSellerName() const {
   return game_name;
 }
 
