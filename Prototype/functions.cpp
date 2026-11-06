@@ -469,6 +469,16 @@ std::string applyTransaction(){
 // HELPER FUNCTIONS
 //
 
+// Generically append a line to a file
+void appendFile(){
+    // TODO
+}
+
+// Generically remove a line from a file
+void removeFromFile(){
+    // TODO
+}
+
 // Requirements for a valid password
 bool passwordValid(std::string password){
     // TODO
