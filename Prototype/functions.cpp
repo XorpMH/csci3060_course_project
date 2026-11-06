@@ -23,6 +23,8 @@ bool login(const std::string &username,
         return false;
     }
 
+    // TODO: replace user vector with a call to currentUserAccounts()
+
     // Search for the username
     for (const User &user : users)
     {
@@ -50,6 +52,8 @@ void logout(bool &logged_in,
     logged_in = false;
     current_username = "";
     current_user_type = "";
+
+    // TODO: create and apply daily_transactions file
 
     std::cout << "Logout successful\n";
 }
@@ -99,6 +103,9 @@ bool createUser(User current_user, // The user executing the command
 
     // Create the user
     users->push_back(User(username, type, email, password));
+
+    // TODO: replace push_back with a constructing a transaction and adding it to the transactions list
+
     return true;
 }
 
@@ -120,6 +127,8 @@ bool deleteUser(User current_user, // The user executing the command
             return true;
         }
     }
+
+    // TODO: replace erase with a constructing a transaction and adding it to the transactions list
 
     return false;
 }
