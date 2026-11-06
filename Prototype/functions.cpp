@@ -3,13 +3,10 @@
 #include "functions.h"
 #include <iostream>
 #include <vector>
-<<<<<<< HEAD
 #include <cmath>
-=======
 #include <iostream>
 #include <fstream>
 #include <iomanip>
->>>>>>> 1b2bcb47118e99a4dc05fca2ca3a1a8cb732fc87
 
 // Login function
 bool login(const std::string &username,
@@ -58,12 +55,7 @@ void logout(bool &logged_in,
 }
 
 // listAccounts function
-<<<<<<< HEAD
-void listAccounts(const std::vector<User> &users)
-{
-=======
 void listAccounts(const std::vector<User> users) {
->>>>>>> 1b2bcb47118e99a4dc05fca2ca3a1a8cb732fc87
 
     if (users.empty())
     {
@@ -137,9 +129,8 @@ bool deleteUser(User current_user, // The user executing the command
  // TODO: Do not make the game available until the next session.
 
 void sell(bool logged_in,
-          const std::string& current_user_type,
+          const User current_user,
           const std::string& gamename,
-          const std::string& gamedescription,
           double gameprice,
           const std::vector<Game>& available_games,
           std::vector<Game>& pending_games)
@@ -151,7 +142,7 @@ void sell(bool logged_in,
     }
 
     // Standard-buy accounts cannot sell games
-    if (current_user_type == "BS") {
+    if (current_user.getUserType() == "BS") {
         std::cout << "Error: Standard-buy accounts cannot sell games.\n";
         return;
     }
@@ -186,7 +177,7 @@ void sell(bool logged_in,
     }
 
     // Create a new game
-    Game new_game(gamename, gamedescription, gameprice);
+    Game new_game(gamename, current_user.getUsername(), gameprice);
 
     // TODO: Save the sell transaction to the daily transaction file.
     // Only record the game as pending after the file write succeeds.
@@ -221,21 +212,15 @@ void currentUserAccountsConstructor(std::vector<User>* users){
             // Write the username, and pad anything shorter than 15 characters
             file << it->getUsername().append(15 - it->getUsername().length(), ' ');
             
-            file << "_";
+            file << " ";
 
             // Write user type as a 2 letter capitalized string
             file << it->getUserType();
 
-            file << "_";
+            file << " ";
 
-            // Write the user's credit, append .00 if it is an integer and write only 2 decimals
-            // TODO
-            if(it->getCredit() == static_cast<int>(it->getCredit())){
-                file << it->getCredit() << ".00";
-            }
-            else{
-                file << std::setprecision(2) << it->getCredit();
-            }
+            // Write the user's credit to 2 decimal places
+            file << std::fixed << std::setprecision(2) << it->getCredit();
 
             file << "\n";
         }
@@ -280,13 +265,70 @@ std::vector<User> currentUserAccounts(){
 }
 
 // Build the file from a list of available games
-void availableGamesConstructor(){
-    
+// IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS_PPPPPP
+void availableGamesConstructor(std::vector<Game>* games){
+    // Open file
+    std::ofstream file("assets/current_user_accounts.txt");
+
+    // Write to file if open
+    if(file.is_open()){
+
+        // Write a line for each user
+        for(auto it = games->begin(); it != games->end(); it++){
+            
+            // Write the game name, and pad anything shorter than 19 characters
+            file << it->getGameName().append(19 - it->getGameName().length(), ' ');
+            
+            file << " ";
+
+            // Write seller's username and pad anything shorter than 15 characters
+            file << it->getSellerName().append(19 - it->getSellerName().length(), ' ');
+
+            file << " ";
+
+            // Write the game price to 2 decimal places
+            file << std::fixed << std::setprecision(2) << it->getGamePrice();
+
+            file << "\n";
+        }
+
+        // Close file
+        file.close();
+    }
 }
 
 // Get a list of games from the file
-void availableGames(){
-    std::string file_name = "";
+std::vector<Game> availableGames(){
+    std::string file_path = "assets/current_user_accounts.txt";
+    std::vector<Game> games = {};
+
+    try{
+        // Open file
+        std::ifstream file(file_path);
+
+        // Confirm that filepath exists/file is open
+        if(file.is_open()){
+            
+            // Loop through all lines and add games to the list
+            std::string line;
+            while(std::getline(file, line)){
+                
+                // Get game information from formatted line
+                std::string game_name = line.substr(0,19);
+                std::string seller_name = line.substr(20,15);
+                double price = std::stod(line.substr(36,6));
+
+                // Add game to list
+                games.push_back(Game(game_name, seller_name, price));
+            }
+
+            // Close file
+            file.close();
+        }
+    }
+    catch(...){}
+
+    return games;
 }
 
 // Build the file from a list of user accounts
