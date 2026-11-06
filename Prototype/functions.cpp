@@ -3,7 +3,13 @@
 #include "functions.h"
 #include <iostream>
 #include <vector>
+<<<<<<< HEAD
 #include <cmath>
+=======
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+>>>>>>> 1b2bcb47118e99a4dc05fca2ca3a1a8cb732fc87
 
 // Login function
 bool login(const std::string &username,
@@ -52,8 +58,12 @@ void logout(bool &logged_in,
 }
 
 // listAccounts function
+<<<<<<< HEAD
 void listAccounts(const std::vector<User> &users)
 {
+=======
+void listAccounts(const std::vector<User> users) {
+>>>>>>> 1b2bcb47118e99a4dc05fca2ca3a1a8cb732fc87
 
     if (users.empty())
     {
@@ -79,7 +89,7 @@ bool createUser(User current_user, // The user executing the command
         std::string type){
     
     // Confirm that the current user is an admin
-    if(!(current_user.getUserType()=="admin")){
+    if(!(current_user.getUserType()=="AA")){
         return false;
     }
     
@@ -107,7 +117,7 @@ bool deleteUser(User current_user, // The user executing the command
     ){
     
     // Confirm that the current user is an admin
-    if(!(current_user.getUserType()=="admin")){
+    if(!(current_user.getUserType()=="AA")){
         return false;
     }
     
@@ -197,13 +207,76 @@ void refund(){
 }
 
 // Build the file from a list of user accounts
-void currentUserAccountsConstructor(){
+// UUUUUUUUUUUUUUU_TT_CCCCCCCCC
+void currentUserAccountsConstructor(std::vector<User>* users){
+    // Open file
+    std::ofstream file("assets/current_user_accounts.txt");
 
+    // Write to file if open
+    if(file.is_open()){
+
+        // Write a line for each user
+        for(auto it = users->begin(); it != users->end(); it++){
+            
+            // Write the username, and pad anything shorter than 15 characters
+            file << it->getUsername().append(15 - it->getUsername().length(), ' ');
+            
+            file << "_";
+
+            // Write user type as a 2 letter capitalized string
+            file << it->getUserType();
+
+            file << "_";
+
+            // Write the user's credit, append .00 if it is an integer and write only 2 decimals
+            // TODO
+            if(it->getCredit() == static_cast<int>(it->getCredit())){
+                file << it->getCredit() << ".00";
+            }
+            else{
+                file << std::setprecision(2) << it->getCredit();
+            }
+
+            file << "\n";
+        }
+
+        // Close file
+        file.close();
+    }
 }
 
 // Get a list of user accounts from the file
-void currentUserAccounts(){
-    std::string file_name = "";
+std::vector<User> currentUserAccounts(){
+    std::string file_path = "assets/current_user_accounts.txt";
+    std::vector<User> users = {};
+
+    try{
+        // Open file
+        std::ifstream file(file_path);
+
+        // Confirm that filepath exists/file is open
+        if(file.is_open()){
+            
+            // Loop through all lines and add users to the list
+            std::string line;
+            while(std::getline(file, line)){
+                
+                // Get user information from formatted line
+                std::string username = line.substr(0,15);
+                std::string user_type = line.substr(16,2);
+                double credits = std::stod(line.substr(19,9));
+
+                // Add user to list
+                users.push_back(User(username, user_type, credits));
+            }
+
+            // Close file
+            file.close();
+        }
+    }
+    catch(...){}
+
+    return users;
 }
 
 // Build the file from a list of available games

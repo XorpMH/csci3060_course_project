@@ -66,7 +66,7 @@ void writeFile(std::string file_path, std::string status, std::unordered_map<std
 
         // Write all output pairings
         for(const auto& [key, value] : outputs){
-            file << key << ": " << outputs[key];
+            file << key << ": " << outputs[key] << "\n";
         }
 
         // Write status
