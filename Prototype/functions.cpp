@@ -268,7 +268,7 @@ std::vector<User> currentUserAccounts(){
 // IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS_PPPPPP
 void availableGamesConstructor(std::vector<Game>* games){
     // Open file
-    std::ofstream file("assets/current_user_accounts.txt");
+    std::ofstream file("assets/available_games.txt");
 
     // Write to file if open
     if(file.is_open()){
@@ -299,7 +299,7 @@ void availableGamesConstructor(std::vector<Game>* games){
 
 // Get a list of games from the file
 std::vector<Game> availableGames(){
-    std::string file_path = "assets/current_user_accounts.txt";
+    std::string file_path = "assets/available_games.txt";
     std::vector<Game> games = {};
 
     try{
