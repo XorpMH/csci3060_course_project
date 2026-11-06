@@ -424,9 +424,14 @@ std::vector<Game> gameCollection(const std::vector<Game>& available_games, User 
             std::string game_name = rtrim(line.substr(0,19));
             std::string username = rtrim(line.substr(20,15));
 
-            // Check if the game exists and is owner by the user
+            // Check if the owner is the user
+            if(owner.getUsername() != username){
+                continue;
+            }
+
+            // Check if the game exists
             for(int i = 0; i < available_games.size(); i++){
-                if(available_games[i].getGameName() == game_name && owner.getUsername() == username){
+                if(available_games[i].getGameName() == game_name){
                     // Add the game to the vector
                     games.push_back(available_games[i]);
                     break;
