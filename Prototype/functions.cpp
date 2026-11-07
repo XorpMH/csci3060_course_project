@@ -10,11 +10,12 @@
 
 // Login function
 bool login(const std::string &username,
-           const std::vector<User> &users,
            bool &logged_in,
            std::string &current_username,
            std::string &current_user_type)
 {
+    // Get users from current_users file
+    std::vector<User> users = currentUserAccounts();
 
     // Check if a user is already logged in
     if (logged_in)
@@ -59,7 +60,9 @@ void logout(bool &logged_in,
 }
 
 // listAccounts function
-void listAccounts(const std::vector<User> users) {
+void listAccounts() {
+    // Get users from current_users file
+    std::vector<User> users = currentUserAccounts();
 
     if (users.empty())
     {
@@ -78,11 +81,13 @@ void listAccounts(const std::vector<User> users) {
 
 // Create a new user account
 bool createUser(User current_user, // The user executing the command
-        std::vector<User>* users, // Existing user list, passed by reference
         std::string username, 
         std::string password, 
         std::string email, 
         std::string type){
+    
+    // Get users from current_users file
+    std::vector<User> users = currentUserAccounts();
     
     // Confirm that the current user is an admin
     if(!(current_user.getUserType()=="AA")){
@@ -90,7 +95,7 @@ bool createUser(User current_user, // The user executing the command
     }
     
     // Check that the user being created has a unique username
-    for(auto it = users->begin(); it != users->end(); it++){
+    for(auto it = users.begin(); it != users.end(); it++){
         if(it->getUsername()==username){
             return false;
         }
@@ -102,8 +107,7 @@ bool createUser(User current_user, // The user executing the command
     }
 
     // Create the user
-    users->push_back(User(username, type, email, password));
-
+    users.push_back(User(username, type, email, password));
     // TODO: replace push_back with a constructing a transaction and adding it to the transactions list
 
     return true;
@@ -111,23 +115,24 @@ bool createUser(User current_user, // The user executing the command
 
 // Remove an existing user
 bool deleteUser(User current_user, // The user executing the command
-        std::vector<User>* users,  // Existing user list, passed by reference
         std::string username // The username of the user to delete
     ){
     
+    // Get users from current_users file
+    std::vector<User> users = currentUserAccounts();
+
     // Confirm that the current user is an admin
     if(!(current_user.getUserType()=="AA")){
         return false;
     }
     
     // Find and remove the user from the list
-    for(auto it = users->begin(); it != users->end(); it++){
+    for(auto it = users.begin(); it != users.end(); it++){
         if(it->getUsername()==username){
-            users->erase(it);
+            users.erase(it);
             return true;
         }
     }
-
     // TODO: replace erase with a constructing a transaction and adding it to the transactions list
 
     return false;
@@ -141,9 +146,11 @@ void sell(bool logged_in,
           const User current_user,
           const std::string& gamename,
           double gameprice,
-          const std::vector<Game>& available_games,
           std::vector<Game>& pending_games)
 {
+    // Get games from available_games file
+    std::vector<Game> available_games = availableGames();
+
     // Check if the user is logged in
     if (!logged_in) {
         std::cout << "Error: User must be logged in to sell a game.\n";
