@@ -8,10 +8,6 @@ bool passwordValid(std::string password);
 bool emailValid(std::string email);
 bool typeValid(std::string type);
 
-// Log in to an existing user account
-void login(){
-
-}
 
 // Logout function
 void logout(bool& logged_in,
@@ -98,13 +94,24 @@ void sell(){
 }
 
 // Purchase a game that is up for sale
-void buy(){
-
+bool buy(User& buyer, const Game& game) {
+    // Check if the buyer has enough credit
+    if (buyer.getCredit() < game.getGamePrice()) {
+        return false;
+    }
+    // Deduct the game price from the buyer
+    return buyer.deductCredit(game.getGamePrice());
 }
 
 // Refund a user's purchase
-void refund(){
-
+bool refund(User& buyer, User& seller, double amount) {
+    // Check that the seller has enough credit to refund
+    if (!seller.deductCredit(amount)) {
+        return false;
+    }
+    // Return the credit to the buyer
+    buyer.addCredit(amount);
+    return true;
 }
 
 // Build the file from a list of user accounts

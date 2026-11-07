@@ -16,7 +16,8 @@ bool login(const std::string& username,
 void logout(bool& logged_in,
             std::string& current_username,
             std::string& current_user_type);
+
 void listAccounts(const std::vector<User>& users);
-
-
+bool buy(User& buyer, const Game& game);
+bool refund(User& buyer, User& seller, double amount);
 #endif
