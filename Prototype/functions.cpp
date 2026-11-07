@@ -468,14 +468,19 @@ void dailyTransactionsConstructor(std::vector<std::string> transactions){
 }
 
 // Apply individual transactions from the daily transactions file
-void applyDailyTransactions(std::vector<std::string> transactions){
-    // TODO: take the transactions from the daily transactions file and apply them to the data files
-    // TODO: for loop that goes through all transaction and uses applyTransaction on each of them
+void applyDailyTransactions(std::string file_path){
+    // Get all transactions as strings
+    std::vector<std::string> transactions = readFile(file_path);
+
+    // Apply each transaction to the corresponding file
+    for(std::string transaction: transactions){
+        applyTransaction(transaction);
+    }
 }
 
 // Apply a single transaction
 std::string applyTransaction(std::string transaction){
-    // TODO: call the corresponding transaction function and update the data files
+    // TODO: call the corresponding transaction function and update the data files, transaction is the original transaction string
     // TODO: return a string of the resulting output, this is for the testing suite
 
     return "";
@@ -485,7 +490,7 @@ std::string applyTransaction(std::string transaction){
 // HELPER FUNCTIONS
 //
 
-// Generically append a line to a file
+// Append a line to a file helper
 void appendToFile(std::string file_path, std::string line){
     // Open file to append to it
     std::ofstream file(file_path, std::ios::app);
@@ -501,26 +506,10 @@ void appendToFile(std::string file_path, std::string line){
     }
 }
 
-// Generically remove a line from a file
+// Remove a line from a file helper
 void removeFromFile(std::string file_path, std::string line_to_remove){
     // Open original file
-    std::ifstream inFile(file_path);
-    std::vector<std::string> lines = {};
-
-    // Read all lines from file
-    if(inFile.is_open()){
-        
-        // Loop through all lines and save them to the list
-        std::string line;
-        while(std::getline(inFile, line)){
-            
-            // Add line to list 
-            lines.push_back(line);
-        }
-
-        // Close original file
-        inFile.close();
-    }
+    std::vector<std::string> lines = readFile(file_path);
 
     // Open overwrite file
     std::ofstream outFile(file_path);
@@ -543,6 +532,31 @@ void removeFromFile(std::string file_path, std::string line_to_remove){
         // Close file
         outFile.close();
     }
+}
+
+// Read all lines from a file helper
+std::vector<std::string> readFile(std::string file_path){
+    std::vector<std::string> lines = {};
+
+    // Open file
+    std::ifstream inFile(file_path);
+
+    // Read all lines from file
+    if(inFile.is_open()){
+        
+        // Loop through all lines and save them to the list
+        std::string line;
+        while(std::getline(inFile, line)){
+            
+            // Add line to list 
+            lines.push_back(line);
+        }
+
+        // Close original file
+        inFile.close();
+    }
+
+    return lines;
 }
 
 // Requirements for a valid password
