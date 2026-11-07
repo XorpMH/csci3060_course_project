@@ -497,7 +497,7 @@ void appendToFile(std::string file_path, std::string line){
 }
 
 // Remove a line from a file helper
-void removeFromFile(std::string file_path, std::string line_to_remove){
+void removeFromFile(const std::string& file_path, const std::string& line_to_remove){
     // Open original file
     std::vector<std::string> lines = readFile(file_path);
 
@@ -525,7 +525,7 @@ void removeFromFile(std::string file_path, std::string line_to_remove){
 }
 
 // Read all lines from a file helper
-std::vector<std::string> readFile(std::string file_path){
+std::vector<std::string> readFile(const std::string& file_path){
     std::vector<std::string> lines = {};
 
     // Open file
@@ -547,6 +547,26 @@ std::vector<std::string> readFile(std::string file_path){
     }
 
     return lines;
+}
+
+// Write all lines to a file helper
+void writeFile(const std::string& file_path, const std::vector<std::string>& lines){
+    // Open file
+    std::ofstream file(file_path);
+
+    // Write to file if open
+    if(file.is_open()){
+
+        // Write each line
+        for(std::string line : lines){
+            
+            // Write line to the file
+            file << line << "\n";
+        }
+
+        // Close file
+        file.close();
+    }
 }
 
 // Requirements for a valid password
