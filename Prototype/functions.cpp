@@ -450,8 +450,9 @@ std::vector<Game> gameCollection(const std::vector<Game>& available_games, User 
 }
 
 // Create the daily transactions file at logout
-void dailyTransactionsConstructor(std::vector<std::string> transactions){
-    // TODO: take a list of transactions and write them to a single file line by line, named "daily_transaction_date_time.txt"
+void dailyTransactionsConstructor(std::vector<std::string> transactions, std::string file_path){
+    // Write all transactions line-by-line into the file
+    writeFile(file_path, transactions);
 }
 
 // Apply individual transactions from the daily transactions file
@@ -580,7 +581,7 @@ bool emailValid(std::string email){
 
 // Requirements for a valid user type
 bool typeValid(std::string type){
-    //TODO
+    // TODO
     return true;
 }
 
