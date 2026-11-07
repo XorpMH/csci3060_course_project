@@ -1,4 +1,2 @@
-username: existinguser
-sell: gamename
-price: 25.00
-buy: gamename
+03 gamename             existinguser    025.00
+04 gamename             existinguser    existinguser    025.00
