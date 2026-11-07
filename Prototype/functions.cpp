@@ -14,7 +14,6 @@ bool login(const std::string &username,
            std::string &current_username,
            std::string &current_user_type)
 {
-
     // Check if a user is already logged in
     if (logged_in)
     {
@@ -54,9 +53,13 @@ void logout(bool &logged_in,
 }
 
 // listAccounts function
+<<<<<<< HEAD
 void listAccounts(const std::vector<User> &users)
 {
 
+=======
+void listAccounts(const std::vector<User> users) {
+>>>>>>> 2374b2a1b8815a7ba90bdc73d88485e11de2ede0
     if (users.empty())
     {
         std::cout << "No accounts found." << std::endl;
@@ -74,7 +77,7 @@ void listAccounts(const std::vector<User> &users)
 
 // Create a new user account
 bool createUser(User current_user, // The user executing the command
-        std::vector<User>* users, // Existing user list, passed by reference
+        std::vector<User>& users, // Existing user list, passed by reference
         std::string username, 
         std::string password, 
         std::string email, 
@@ -86,7 +89,7 @@ bool createUser(User current_user, // The user executing the command
     }
     
     // Check that the user being created has a unique username
-    for(auto it = users->begin(); it != users->end(); it++){
+    for(auto it = users.begin(); it != users.end(); it++){
         if(it->getUsername()==username){
             return false;
         }
@@ -98,28 +101,38 @@ bool createUser(User current_user, // The user executing the command
     }
 
     // Create the user
+<<<<<<< HEAD
     users->push_back(User(username, type, email, password));
+=======
+    users.push_back(User(username, type, email, password));
+    // TODO: replace push_back with a constructing a transaction and adding it to the transactions list
+
+>>>>>>> 2374b2a1b8815a7ba90bdc73d88485e11de2ede0
     return true;
 }
 
 // Remove an existing user
 bool deleteUser(User current_user, // The user executing the command
-        std::vector<User>* users,  // Existing user list, passed by reference
+        std::vector<User>& users,  // Existing user list, passed by reference
         std::string username // The username of the user to delete
     ){
-    
+
     // Confirm that the current user is an admin
     if(!(current_user.getUserType()=="AA")){
         return false;
     }
     
     // Find and remove the user from the list
-    for(auto it = users->begin(); it != users->end(); it++){
+    for(auto it = users.begin(); it != users.end(); it++){
         if(it->getUsername()==username){
-            users->erase(it);
+            users.erase(it);
             return true;
         }
     }
+<<<<<<< HEAD
+=======
+    // TODO: replace erase with a constructing a transaction and adding it to the transactions list
+>>>>>>> 2374b2a1b8815a7ba90bdc73d88485e11de2ede0
 
     return false;
 }
@@ -136,6 +149,7 @@ void sell(bool logged_in,
           const std::vector<Game>& available_games,
           std::vector<Game>& pending_games)
 {
+
     // Check if the user is logged in
     if (!logged_in) {
         std::cout << "Error: User must be logged in to sell a game.\n";
@@ -289,12 +303,165 @@ void gameCollectionConstructor(){
 // Get a list of games from the user's file
 void gameCollection(User user){
 
+<<<<<<< HEAD
+=======
+    // Open file
+    std::ifstream file("assets/game_collection.txt");
+
+    // Read all lines from file
+    if(file.is_open()){
+        
+        // Loop through all lines and save them to the list
+        std::string line;
+        while(std::getline(file, line)){
+            
+            // Construct game name and username
+            std::string game_name = rtrim(line.substr(0,19));
+            std::string username = rtrim(line.substr(20,15));
+
+            // Check if the owner is the user
+            if(owner.getUsername() != username){
+                continue;
+            }
+
+            // Check if the game exists
+            for(int i = 0; i < available_games.size(); i++){
+                if(available_games[i].getGameName() == game_name){
+                    // Add the game to the vector
+                    games.push_back(available_games[i]);
+                    break;
+                }
+            }
+        }
+
+        // Close file
+        file.close();
+    }
+
+    return games;
+}
+
+// Create the daily transactions file at logout
+void dailyTransactionsConstructor(std::vector<std::string> transactions){
+    // TODO: take a list of transactions and write them to a single file line by line, named "daily_transaction_date_time.txt"
+}
+
+// Apply individual transactions from the daily transactions file
+void applyDailyTransactions(std::string file_path){
+    // Get all transactions as strings
+    std::vector<std::string> transactions = readFile(file_path);
+
+    // Apply each transaction to the corresponding file
+    for(std::string transaction: transactions){
+        applyTransaction(transaction);
+    }
+}
+
+// Apply a single transaction
+std::string applyTransaction(std::string transaction){
+    // TODO: call the corresponding transaction function and update the data files, transaction is the original transaction string
+    // TODO: return a string of the resulting output, this is for the testing suite
+
+    return "";
+>>>>>>> 2374b2a1b8815a7ba90bdc73d88485e11de2ede0
 }
 
 //
 // HELPER FUNCTIONS
 //
 
+<<<<<<< HEAD
+=======
+// Append a line to a file helper
+void appendToFile(std::string file_path, std::string line){
+    // Open file to append to it
+    std::ofstream file(file_path, std::ios::app);
+
+    // Write to file if open
+    if(file.is_open()){
+        
+        // Add line to end of file
+        file << line << "\n";
+
+        // Close file
+        file.close();
+    }
+}
+
+// Remove a line from a file helper
+void removeFromFile(const std::string& file_path, const std::string& line_to_remove){
+    // Open original file
+    std::vector<std::string> lines = readFile(file_path);
+
+    // Open overwrite file
+    std::ofstream outFile(file_path);
+
+    // Write to file if open
+    if(outFile.is_open()){
+        
+        // Find the line to remove
+        for(int i = 0; i < lines.size(); i++){
+            
+            // Write everything except the line to remove
+            if(lines[i] == line_to_remove){
+                // Do nothing
+            }
+            else{
+                outFile << lines[i] << "\n";
+            }
+        }
+
+        // Close file
+        outFile.close();
+    }
+}
+
+// Read all lines from a file helper
+std::vector<std::string> readFile(const std::string& file_path){
+    std::vector<std::string> lines = {};
+
+    // Open file
+    std::ifstream inFile(file_path);
+
+    // Read all lines from file
+    if(inFile.is_open()){
+        
+        // Loop through all lines and save them to the list
+        std::string line;
+        while(std::getline(inFile, line)){
+            
+            // Add line to list 
+            lines.push_back(line);
+        }
+
+        // Close original file
+        inFile.close();
+    }
+
+    return lines;
+}
+
+// Write all lines to a file helper
+void writeFile(const std::string& file_path, const std::vector<std::string>& lines){
+    // Open file
+    std::ofstream file(file_path);
+
+    // Write to file if open
+    if(file.is_open()){
+
+        // Write each line
+        for(std::string line : lines){
+            
+            // Write line to the file
+            file << line << "\n";
+        }
+
+        // Close file
+        file.close();
+    }
+}
+
+>>>>>>> 2374b2a1b8815a7ba90bdc73d88485e11de2ede0
 // Requirements for a valid password
 bool passwordValid(std::string password){
     return true;
