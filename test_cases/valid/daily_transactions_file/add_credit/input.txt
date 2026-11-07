@@ -1,3 +1,0 @@
-username: adminuser
-account: admin
-addcredit: 100.00

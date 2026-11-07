@@ -1,3 +1,0 @@
-username: existinguser
-sell: gamename
-price: 25.00
