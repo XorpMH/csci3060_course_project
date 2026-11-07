@@ -205,9 +205,9 @@ void refund(){
 
 // Build the file from a list of user accounts
 // UUUUUUUUUUUUUUU_TT_CCCCCCCCC
-void currentUserAccountsConstructor(std::vector<User>* users){
+void currentUserAccountsConstructor(std::vector<User>* users, std::string file_path){
     // Open file
-    std::ofstream file("assets/current_user_accounts.txt");
+    std::ofstream file(file_path);
 
     // Write to file if open
     if(file.is_open()){
@@ -237,8 +237,7 @@ void currentUserAccountsConstructor(std::vector<User>* users){
 }
 
 // Get a list of user accounts from the file
-std::vector<User> currentUserAccounts(){
-    std::string file_path = "assets/current_user_accounts.txt";
+std::vector<User> currentUserAccounts(std::string file_path){
     std::vector<User> users = {};
 
     try{
@@ -272,9 +271,9 @@ std::vector<User> currentUserAccounts(){
 
 // Build the file from a list of available games
 // IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS_PPPPPP
-void availableGamesConstructor(std::vector<Game>* games){
+void availableGamesConstructor(std::vector<Game>* games, std::string file_path){
     // Open file
-    std::ofstream file("assets/available_games.txt");
+    std::ofstream file(file_path);
 
     // Write to file if open
     if(file.is_open()){
@@ -304,8 +303,7 @@ void availableGamesConstructor(std::vector<Game>* games){
 }
 
 // Get a list of games from the file
-std::vector<Game> availableGames(){
-    std::string file_path = "assets/available_games.txt";
+std::vector<Game> availableGames(std::string file_path){
     std::vector<Game> games = {};
 
     try{
@@ -339,9 +337,9 @@ std::vector<Game> availableGames(){
 
 // Append to the file containing ownership of games from a game and its owner, or create it if it doesn't exist
 // IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
-void appendGameCollection(Game game, User owner){
+void appendGameCollection(Game game, User owner, std::string file_path){
     // Open file to append to it
-    std::ofstream file("assets/game_collection.txt", std::ios::app);
+    std::ofstream file(file_path, std::ios::app);
 
     // Write to file if open
     if(file.is_open()){
@@ -363,8 +361,7 @@ void appendGameCollection(Game game, User owner){
 
 // Remove a game from a user's ownership
 // IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
-void removeGameCollection(Game game, User owner){
-    std::string file_path = "assets/game_collection.txt";
+void removeGameCollection(Game game, User owner, std::string file_path){
     
     // Open original file
     std::ifstream inFile(file_path);
@@ -413,11 +410,11 @@ void removeGameCollection(Game game, User owner){
 }
 
 // Get a list of owned games owned by a specific user
-std::vector<Game> gameCollection(const std::vector<Game>& available_games, User owner){
+std::vector<Game> gameCollection(const std::vector<Game>& available_games, User owner, std::string file_path){
     std::vector<Game> games = {};
 
     // Open file
-    std::ifstream file("assets/game_collection.txt");
+    std::ifstream file(file_path);
 
     // Read all lines from file
     if(file.is_open()){
