@@ -10,13 +10,11 @@
 
 // Login function
 bool login(const std::string &username,
+           const std::vector<User> &users,
            bool &logged_in,
            std::string &current_username,
            std::string &current_user_type)
 {
-    // Get users from current_users file
-    std::vector<User> users = currentUserAccounts();
-
     // Check if a user is already logged in
     if (logged_in)
     {
@@ -60,10 +58,7 @@ void logout(bool &logged_in,
 }
 
 // listAccounts function
-void listAccounts() {
-    // Get users from current_users file
-    std::vector<User> users = currentUserAccounts();
-
+void listAccounts(const std::vector<User> users) {
     if (users.empty())
     {
         std::cout << "No accounts found." << std::endl;
@@ -81,13 +76,11 @@ void listAccounts() {
 
 // Create a new user account
 bool createUser(User current_user, // The user executing the command
+        std::vector<User>& users, // Existing user list, passed by reference
         std::string username, 
         std::string password, 
         std::string email, 
         std::string type){
-    
-    // Get users from current_users file
-    std::vector<User> users = currentUserAccounts();
     
     // Confirm that the current user is an admin
     if(!(current_user.getUserType()=="AA")){
@@ -115,11 +108,9 @@ bool createUser(User current_user, // The user executing the command
 
 // Remove an existing user
 bool deleteUser(User current_user, // The user executing the command
+        std::vector<User>& users,  // Existing user list, passed by reference
         std::string username // The username of the user to delete
     ){
-    
-    // Get users from current_users file
-    std::vector<User> users = currentUserAccounts();
 
     // Confirm that the current user is an admin
     if(!(current_user.getUserType()=="AA")){
@@ -146,10 +137,9 @@ void sell(bool logged_in,
           const User current_user,
           const std::string& gamename,
           double gameprice,
+          const std::vector<Game>& available_games,
           std::vector<Game>& pending_games)
 {
-    // Get games from available_games file
-    std::vector<Game> available_games = availableGames();
 
     // Check if the user is logged in
     if (!logged_in) {
