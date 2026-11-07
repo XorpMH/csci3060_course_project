@@ -537,10 +537,7 @@ bool emailValid(std::string email){
 
 // Requirements for a valid user type
 bool typeValid(std::string type){
-<<<<<<< HEAD
-=======
     // TODO
->>>>>>> 9fecc46c9aac568060dfeb2de8757d66bad3c835
     return true;
 }
 
