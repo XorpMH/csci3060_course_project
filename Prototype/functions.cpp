@@ -53,13 +53,7 @@ void logout(bool &logged_in,
 }
 
 // listAccounts function
-<<<<<<< HEAD
-void listAccounts(const std::vector<User> &users)
-{
-
-=======
 void listAccounts(const std::vector<User> users) {
->>>>>>> 2374b2a1b8815a7ba90bdc73d88485e11de2ede0
     if (users.empty())
     {
         std::cout << "No accounts found." << std::endl;
@@ -101,13 +95,9 @@ bool createUser(User current_user, // The user executing the command
     }
 
     // Create the user
-<<<<<<< HEAD
-    users->push_back(User(username, type, email, password));
-=======
     users.push_back(User(username, type, email, password));
     // TODO: replace push_back with a constructing a transaction and adding it to the transactions list
 
->>>>>>> 2374b2a1b8815a7ba90bdc73d88485e11de2ede0
     return true;
 }
 
@@ -129,10 +119,7 @@ bool deleteUser(User current_user, // The user executing the command
             return true;
         }
     }
-<<<<<<< HEAD
-=======
     // TODO: replace erase with a constructing a transaction and adding it to the transactions list
->>>>>>> 2374b2a1b8815a7ba90bdc73d88485e11de2ede0
 
     return false;
 }
@@ -214,9 +201,9 @@ void refund(){
 
 // Build the file from a list of user accounts
 // UUUUUUUUUUUUUUU_TT_CCCCCCCCC
-void currentUserAccountsConstructor(std::vector<User>* users){
+void currentUserAccountsConstructor(std::vector<User>* users, std::string file_path){
     // Open file
-    std::ofstream file("assets/current_user_accounts.txt");
+    std::ofstream file(file_path);
 
     // Write to file if open
     if(file.is_open()){
@@ -252,8 +239,7 @@ void currentUserAccountsConstructor(std::vector<User>* users){
 }
 
 // Get a list of user accounts from the file
-std::vector<User> currentUserAccounts(){
-    std::string file_path = "assets/current_user_accounts.txt";
+std::vector<User> currentUserAccounts(std::string file_path){
     std::vector<User> users = {};
 
     try{
@@ -286,27 +272,107 @@ std::vector<User> currentUserAccounts(){
 }
 
 // Build the file from a list of available games
-void availableGamesConstructor(){
-    
+// IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS_PPPPPP
+void availableGamesConstructor(std::vector<Game>* games, std::string file_path){
+    // Open file
+    std::ofstream file(file_path);
+
+    // Write to file if open
+    if(file.is_open()){
+
+        // Write a line for each game
+        for(auto it = games->begin(); it != games->end(); it++){
+            
+            // Write the game name and pad anything shorter than 19 characters
+            file << std::left << std::setw(19) << it->getGameName();
+            
+            file << " ";
+
+            // Write seller's username and pad anything shorter than 15 characters
+            file << std::left << std::setw(15) << it->getSellerName();
+
+            file << " ";
+
+            // Write the game price to 2 decimal places
+            file << std::left << std::setw(6) << std::fixed << std::setprecision(2) << it->getGamePrice();
+
+            file << "\n";
+        }
+
+        // Close file
+        file.close();
+    }
 }
 
 // Get a list of games from the file
-void availableGames(){
-    std::string file_name = "";
+std::vector<Game> availableGames(std::string file_path){
+    std::vector<Game> games = {};
+
+    try{
+        // Open file
+        std::ifstream file(file_path);
+
+        // Confirm that filepath exists/file is open
+        if(file.is_open()){
+            
+            // Loop through all lines and add games to the list
+            std::string line;
+            while(std::getline(file, line)){
+                
+                // Get game information from formatted line
+                std::string game_name = rtrim(line.substr(0,19));
+                std::string seller_name = rtrim(line.substr(20,15));
+                double price = std::stod(rtrim(line.substr(36,6)));
+
+                // Add game to list
+                games.push_back(Game(game_name, seller_name, price));
+            }
+
+            // Close file
+            file.close();
+        }
+    }
+    catch(...){}
+
+    return games;
 }
 
-// Build the file from a list of user accounts
-void gameCollectionConstructor(){
+// Append to the file containing ownership of games from a game and its owner, or create it if it doesn't exist
+// IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
+void appendGameCollection(Game game, User owner, std::string file_path){
+    // Open file to append to it
+    std::ofstream file(file_path, std::ios::app);
+
+    // Write to file if open
+    if(file.is_open()){
+        
+        // Write the game name and pad anything shorter than 19 characters
+        file << std::left << std::setw(19) << game.getGameName();
+
+        file << " ";
+
+        // Write the owner's name and pad anything shorter than 15 characters
+        file << std::left << std::setw(15) << owner.getUsername();
+
+        file << "\n";
+
+        // Close file
+        file.close();
+    }
+}
+
+// Remove a game from a user's ownership
+// IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
+void removeGameCollection(Game game, User owner, std::string file_path){
     
 }
 
-// Get a list of games from the user's file
-void gameCollection(User user){
+// Get a list of owned games owned by a specific user
+std::vector<Game> gameCollection(const std::vector<Game>& available_games, User owner, std::string file_path){
+    std::vector<Game> games = {};
 
-<<<<<<< HEAD
-=======
     // Open file
-    std::ifstream file("assets/game_collection.txt");
+    std::ifstream file(file_path);
 
     // Read all lines from file
     if(file.is_open()){
@@ -363,15 +429,12 @@ std::string applyTransaction(std::string transaction){
     // TODO: return a string of the resulting output, this is for the testing suite
 
     return "";
->>>>>>> 2374b2a1b8815a7ba90bdc73d88485e11de2ede0
 }
 
 //
 // HELPER FUNCTIONS
 //
 
-<<<<<<< HEAD
-=======
 // Append a line to a file helper
 void appendToFile(std::string file_path, std::string line){
     // Open file to append to it
@@ -461,7 +524,6 @@ void writeFile(const std::string& file_path, const std::vector<std::string>& lin
     }
 }
 
->>>>>>> 2374b2a1b8815a7ba90bdc73d88485e11de2ede0
 // Requirements for a valid password
 bool passwordValid(std::string password){
     return true;
@@ -475,4 +537,12 @@ bool emailValid(std::string email){
 // Requirements for a valid user type
 bool typeValid(std::string type){
     return true;
+}
+
+// Trim right
+std::string rtrim(std::string& s){
+    // Line taken from stack overflow https://stackoverflow.com/questions/216823/how-can-i-trim-a-stdstring
+    s.erase(s.find_last_not_of(" \n\r\t") + 1);
+    
+    return s;
 }
