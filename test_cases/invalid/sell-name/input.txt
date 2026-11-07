@@ -1,3 +1,1 @@
-username: existinguser
-sell: gamenamewaytooverylongname
-price: 25.00
+03 gamenamewaytooverlylongname existinguser    025.00
