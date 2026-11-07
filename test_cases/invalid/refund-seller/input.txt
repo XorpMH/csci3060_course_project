@@ -1,4 +1,1 @@
-username: existinguser
-refund buyer: existinguser
-refund seller: notseller
-amount: 10.00
+05 existinguser    notseller       000010.00
