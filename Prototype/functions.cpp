@@ -425,9 +425,16 @@ void applyDailyTransactions(std::string file_path){
 }
 
 // Apply a single transaction
+// XX UUUUUUUUUUUUUUU TT CCCCCCCCC (01, 02, 06, 00)
+// XX UUUUUUUUUUUUUUU SSSSSSSSSSSSSSS CCCCCCCCC (05)
+// XX IIIIIIIIIIIIIIIIIII SSSSSSSSSSSSSSS PPPPPP (03)
+// XX IIIIIIIIIIIIIIIIIII SSSSSSSSSSSSSSS UUUUUUUUUUUUUUU PPPPPP (04)
 std::string applyTransaction(std::string transaction){
     // TODO: call the corresponding transaction function and update the data files, transaction is the original transaction string
     // TODO: return a string of the resulting output, this is for the testing suite
+
+    std::string code = rtrim(transaction.substr(0,2));
+    
 
     return "";
 }
