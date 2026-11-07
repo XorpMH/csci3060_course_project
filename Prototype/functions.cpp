@@ -3,7 +3,6 @@
 #include "functions.h"
 #include <iostream>
 #include <vector>
-#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -21,8 +20,6 @@ bool login(const std::string &username,
         std::cout << "Login failed: user is already logged in\n";
         return false;
     }
-
-    // TODO: replace user vector with a call to currentUserAccounts()
 
     // Search for the username
     for (const User &user : users)
@@ -51,8 +48,6 @@ void logout(bool &logged_in,
     logged_in = false;
     current_username = "";
     current_user_type = "";
-
-    // TODO: create and apply daily_transactions file
 
     std::cout << "Logout successful\n";
 }
@@ -134,8 +129,9 @@ bool deleteUser(User current_user, // The user executing the command
  // TODO: Do not make the game available until the next session.
 
 void sell(bool logged_in,
-          const User current_user,
+          const std::string& current_user_type,
           const std::string& gamename,
+          const std::string& gamedescription,
           double gameprice,
           const std::vector<Game>& available_games,
           std::vector<Game>& pending_games)
@@ -148,7 +144,7 @@ void sell(bool logged_in,
     }
 
     // Standard-buy accounts cannot sell games
-    if (current_user.getUserType() == "BS") {
+    if (current_user_type == "BS") {
         std::cout << "Error: Standard-buy accounts cannot sell games.\n";
         return;
     }
@@ -183,7 +179,7 @@ void sell(bool logged_in,
     }
 
     // Create a new game
-    Game new_game(gamename, current_user.getUsername(), gameprice);
+    Game new_game(gamename, gamedescription, gameprice);
 
     // TODO: Save the sell transaction to the daily transaction file.
     // Only record the game as pending after the file write succeeds.
@@ -215,18 +211,24 @@ void currentUserAccountsConstructor(std::vector<User>* users, std::string file_p
         // Write a line for each user
         for(auto it = users->begin(); it != users->end(); it++){
             
-            // Write the username and pad anything shorter than 15 characters
-            file << std::left << std::setw(15) << it->getUsername();
+            // Write the username, and pad anything shorter than 15 characters
+            file << it->getUsername().append(15 - it->getUsername().length(), ' ');
             
-            file << " ";
+            file << "_";
 
             // Write user type as a 2 letter capitalized string
             file << it->getUserType();
 
-            file << " ";
+            file << "_";
 
-            // Write the user's credit to 2 decimal places
-            file << std::left << std::setw(9) << std::fixed << std::setprecision(2) << it->getCredit();
+            // Write the user's credit, append .00 if it is an integer and write only 2 decimals
+            // TODO
+            if(it->getCredit() == static_cast<int>(it->getCredit())){
+                file << it->getCredit() << ".00";
+            }
+            else{
+                file << std::setprecision(2) << it->getCredit();
+            }
 
             file << "\n";
         }
@@ -252,9 +254,9 @@ std::vector<User> currentUserAccounts(std::string file_path){
             while(std::getline(file, line)){
                 
                 // Get user information from formatted line
-                std::string username = rtrim(line.substr(0,15));
-                std::string user_type = rtrim(line.substr(16,2));
-                double credits = std::stod(rtrim(line.substr(19,9)));
+                std::string username = line.substr(0,15);
+                std::string user_type = line.substr(16,2);
+                double credits = std::stod(line.substr(19,9));
 
                 // Add user to list
                 users.push_back(User(username, user_type, credits));
@@ -363,50 +365,6 @@ void appendGameCollection(Game game, User owner, std::string file_path){
 // IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
 void removeGameCollection(Game game, User owner, std::string file_path){
     
-    // Open original file
-    std::ifstream inFile(file_path);
-    std::vector<std::string> lines = {};
-
-    // Read all lines from file
-    if(inFile.is_open()){
-        
-        // Loop through all lines and save them to the list
-        std::string line;
-        while(std::getline(inFile, line)){
-            
-            // Add line to list 
-            lines.push_back(line);
-        }
-
-        // Close original file
-        inFile.close();
-    }
-
-    // Open overwrite file
-    std::ofstream outFile(file_path);
-
-    // Write to file if open
-    if(outFile.is_open()){
-        
-        // Find the line to remove
-        for(int i = 0; i < lines.size(); i++){
-            
-            // Construct game name and username
-            std::string game_name = rtrim(lines[i].substr(0,19));
-            std::string username = rtrim(lines[i].substr(20,15));
-
-            // Write everything except the ownership to remove
-            if(game.getGameName() == game_name && owner.getUsername() == username){
-                // Do nothing
-            }
-            else{
-                outFile << lines[i] << "\n";
-            }
-        }
-
-        // Close file
-        outFile.close();
-    }
 }
 
 // Get a list of owned games owned by a specific user
@@ -576,19 +534,20 @@ void writeFile(const std::string& file_path, const std::vector<std::string>& lin
 
 // Requirements for a valid password
 bool passwordValid(std::string password){
-    // TODO
     return true;
 }
 
 // Requirements for a valid email
 bool emailValid(std::string email){
-    // TODO
     return true;
 }
 
 // Requirements for a valid user type
 bool typeValid(std::string type){
+<<<<<<< HEAD
+=======
     // TODO
+>>>>>>> 9fecc46c9aac568060dfeb2de8757d66bad3c835
     return true;
 }
 
