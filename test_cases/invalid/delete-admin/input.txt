@@ -1,3 +1,1 @@
-account: adminuser
-username: adminuser
-delete
+02 adminuser       AA 000500.00
