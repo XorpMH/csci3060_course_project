@@ -1,13 +1,12 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <filesystem>
-
 #include "functions.h"
 
 // Shorten std::filesystem to fs
 namespace fs = std::filesystem;
-
 
 // Recursively find all test input files
 std::vector<std::string> findTestFiles(const std::string& directory)

@@ -1,7 +1,0 @@
-account: adminuser
-username: newuser
-password: 123456789
-email: newuser@gmailcom
-type: full-standard
-credit: 1000000
-create

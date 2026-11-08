@@ -1,6 +1,1 @@
-account: admin
-username: verylongusername
-password: 123456789
-email: newuser@gmail.com
-type: admin
-create
+01 verylongusername AA 000000.00

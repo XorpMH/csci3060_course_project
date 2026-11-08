@@ -1,3 +1,0 @@
-username: existinguser
-type: full-standard
-credit: 100.00

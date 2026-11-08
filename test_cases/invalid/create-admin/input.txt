@@ -1,6 +1,1 @@
-account: existinguser
-username: newuser
-password: 123456789
-email: newuser@gmailcom
-type: admin
-create
+01 newuser         AA 000000.00

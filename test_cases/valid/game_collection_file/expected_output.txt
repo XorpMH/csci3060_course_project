@@ -1,2 +1,0 @@
-gamename           _sellername    _ 25.00
-gamename2          _sellername    _ 50.00
