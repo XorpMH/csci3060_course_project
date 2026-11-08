@@ -23,13 +23,6 @@ User::User(std::string name, std::string type, double amount) {
     credit = amount;
 }
 
-// Minimal constructor for quick/guest user creation
-User::User(std::string name, std::string type) {
-    username = name;
-    user_type = type;
-    credit = 0.0;
-}
-
 // --- GETTERS ---
 
 std::string User::getUsername() const {
