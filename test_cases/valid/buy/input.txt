@@ -1,3 +1,1 @@
-username: existinguser
-buy: gamename
-seller: sellername
+04 gamename            sellername      existinguser    025.00
