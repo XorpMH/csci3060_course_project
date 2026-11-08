@@ -430,11 +430,131 @@ void applyDailyTransactions(std::string file_path){
 // XX IIIIIIIIIIIIIIIIIII SSSSSSSSSSSSSSS PPPPPP (03)
 // XX IIIIIIIIIIIIIIIIIII SSSSSSSSSSSSSSS UUUUUUUUUUUUUUU PPPPPP (04)
 std::string applyTransaction(std::string transaction){
-    // TODO: call the corresponding transaction function and update the data files, transaction is the original transaction string
-    // TODO: return a string of the resulting output, this is for the testing suite
-
-    std::string code = rtrim(transaction.substr(0,2));
+    // Grab the transaction type
+    std::string code = transaction.substr(0,2);
     
+    switch(stoi(code)){
+        // Log out / end of session
+        case 0: {
+            // Confirm correct length
+            if(transaction.length() != 31){
+                return "FAILURE: Improper format";
+            }
+
+            // Parse input values
+            std::string username = rtrim(transaction.substr(3,15));
+            std::string userType = rtrim(transaction.substr(19,2));
+            double credit = stod(transaction.substr(22,9));
+
+            // TODO: call logout, update corresponding files and return SUCCESS or FAILURE
+
+            break;
+        }
+
+        // Create account
+        case 1: {
+            // Confirm correct length
+            if(transaction.length() != 31){
+                return "FAILURE: Improper format";
+            }
+
+            // Parse input values
+            std::string username = rtrim(transaction.substr(3,15));
+            std::string userType = rtrim(transaction.substr(19,2));
+            double credit = stod(transaction.substr(22,9));
+
+            // TODO: call createUser, update corresponding files and return SUCCESS or FAILURE
+
+            break;
+        }
+
+        // Delete account
+        case 2: {
+            // Confirm correct length
+            if(transaction.length() != 31){
+                return "FAILURE: Improper format";
+            }
+
+            // Parse input values
+            std::string username = rtrim(transaction.substr(3,15));
+            std::string userType = rtrim(transaction.substr(19,2));
+            double credit = stod(transaction.substr(22,9));
+
+            // TODO: call deleteUser, update corresponding files and return SUCCESS or FAILURE
+
+            break;
+        }
+
+        // Put a game up for sale
+        case 3: {
+            // Confirm correct length
+            if(transaction.length() != 45){
+                return "FAILURE: Improper format";
+            }
+
+            // Parse input values
+            std::string game_name = rtrim(transaction.substr(3,19));
+            std::string seller_name = rtrim(transaction.substr(23,15));
+            double price = stod(transaction.substr(39,6));
+
+            // TODO: call sell, update corresponding files and return SUCCESS or FAILURE
+
+            break;
+        }
+
+        // Buy a game
+        case 4: {
+            // Confirm correct length
+            if(transaction.length() != 61){
+                return "FAILURE: Improper format";
+            }
+
+            //XX IIIIIIIIIIIIIIIIIII SSSSSSSSSSSSSSS UUUUUUUUUUUUUUU PPPPPP
+            // Parse input values
+            std::string game_name = rtrim(transaction.substr(3,19));
+            std::string seller_name = rtrim(transaction.substr(23,15));
+            std::string buyer_name = rtrim(transaction.substr(39,15));
+            double price = stod(transaction.substr(55,6));
+
+            // TODO: call buy, update corresponding files and return SUCCESS or FAILURE
+
+            break;
+        }
+
+        // Refund a game
+        case 5: {
+            // Confirm correct length
+            if(transaction.length() != 44){
+                return "FAILURE: Improper format";
+            }
+
+            // Parse input values
+            std::string buyer_name = rtrim(transaction.substr(3,15));
+            std::string seller_name = rtrim(transaction.substr(19,15));
+            double refund_credit = stod(transaction.substr(35,9));
+
+            // TODO: call refund, update corresponding files and return SUCCESS or FAILURE
+
+            break;
+        }
+
+        // Add credit to a user
+        case 6: {
+            // Confirm correct length
+            if(transaction.length() != 31){
+                return "FAILURE: Improper format";
+            }
+
+            // Parse input values
+            std::string username = rtrim(transaction.substr(3,15));
+            std::string userType = rtrim(transaction.substr(19,2));
+            double credit = stod(transaction.substr(22,9));
+
+            // TODO: call addCredit, update corresponding files and return SUCCESS or FAILURE
+
+            break;
+        }
+    }
 
     return "";
 }
