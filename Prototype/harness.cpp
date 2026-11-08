@@ -1,12 +1,16 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <fstream>
 #include <filesystem>
+#include <algorithm>
+#include <cctype>
+
 #include "functions.h"
+#include "game.h"
 
 // Shorten std::filesystem to fs
 namespace fs = std::filesystem;
+
 
 // Recursively find all test input files
 std::vector<std::string> findTestFiles(const std::string& directory)
@@ -20,16 +24,23 @@ std::vector<std::string> findTestFiles(const std::string& directory)
     }
 
     // Go through all files and subfolders
-    for (const auto& entry : fs::recursive_directory_iterator(directory))
+    for (const auto& entry :
+         fs::recursive_directory_iterator(directory))
     {
-        // Check if the file is named input.txt
         if (entry.is_regular_file() &&
             entry.path().filename() == "input.txt")
         {
-            // Store the file path for later testing
-            test_files.push_back(entry.path().string());
+            test_files.push_back(
+                entry.path().string()
+            );
         }
     }
+
+    // Keep test order consistent
+    std::sort(
+        test_files.begin(),
+        test_files.end()
+    );
 
     return test_files;
 }
@@ -55,82 +66,212 @@ bool containsStatus(
 
 // Compare expected output and actual output
 bool compareFile(
-    std::string file_path1,
-    std::string file_path2
+    const std::string& file_path1,
+    const std::string& file_path2
 )
 {
     // Check that both files exist
-    if (!fs::exists(file_path1) || !fs::exists(file_path2))
+    if (!fs::exists(file_path1) ||
+        !fs::exists(file_path2))
     {
         return false;
     }
 
-    // Use readFile from functions.cpp
-    std::vector<std::string> file1 = readFile(file_path1);
-    std::vector<std::string> file2 = readFile(file_path2);
+    // Read both files
+    std::vector<std::string> file1 =
+        readFile(file_path1);
 
-    // Check whether both files contain SUCCESS
-    bool file1_success = containsStatus(file1, "SUCCESS");
-    bool file2_success = containsStatus(file2, "SUCCESS");
+    std::vector<std::string> file2 =
+        readFile(file_path2);
+
+    // Check SUCCESS
+    bool file1_success =
+        containsStatus(file1, "SUCCESS");
+
+    bool file2_success =
+        containsStatus(file2, "SUCCESS");
 
     if (file1_success && file2_success)
     {
         return true;
     }
 
-    // Check whether both files contain FAILURE
-    bool file1_failure = containsStatus(file1, "FAILURE");
-    bool file2_failure = containsStatus(file2, "FAILURE");
+    // Check FAILURE
+    bool file1_failure =
+        containsStatus(file1, "FAILURE");
+
+    bool file2_failure =
+        containsStatus(file2, "FAILURE");
 
     if (file1_failure && file2_failure)
     {
         return true;
     }
 
-    // Statuses do not match
     return false;
 }
 
+
+// Check whether a line looks like a transaction
+bool isTransactionLine(const std::string& line)
+{
+    if (line.length() < 2)
+    {
+        return false;
+    }
+
+    return std::isdigit(
+               static_cast<unsigned char>(line[0])
+           ) &&
+           std::isdigit(
+               static_cast<unsigned char>(line[1])
+           );
+}
+
+
+// Generate actual_output.txt from input.txt
+bool generateActualOutput(
+    const std::string& input_file,
+    const std::string& actual_file
+)
+{
+    std::vector<std::string> input_lines =
+        readFile(input_file);
+
+    std::vector<std::string> actual_results;
+
+    if (input_lines.empty())
+    {
+        actual_results.push_back(
+            "FAILURE: Empty input file"
+        );
+
+        writeFile(
+            actual_file,
+            actual_results
+        );
+
+        return true;
+    }
+
+    for (const std::string& line : input_lines)
+    {
+        // Ignore completely empty lines
+        if (line.empty())
+        {
+            continue;
+        }
+
+        // Transaction files begin with 00-06
+        if (isTransactionLine(line))
+        {
+            actual_results.push_back(
+                applyTransaction(line)
+            );
+        }
+        else
+        {
+            // This input is not in daily transaction format
+            actual_results.push_back(
+                "FAILURE: Unsupported input format"
+            );
+        }
+    }
+
+    // Make sure something is written
+    if (actual_results.empty())
+    {
+        actual_results.push_back(
+            "FAILURE: Empty input file"
+        );
+    }
+
+    writeFile(
+        actual_file,
+        actual_results
+    );
+
+    return true;
+}
+
+
+// Test the search function
 void testSearchFunction()
 {
+    std::cout
+        << "=== SEARCH FUNCTION TESTS ==="
+        << std::endl;
+
     std::vector<Game> games = {
-        Game("Minecraft", "Test game", 25.00),
-        Game("Terraria", "Test game", 15.00)
+        Game(
+            "Minecraft",
+            "TestSeller",
+            25.00
+        ),
+        Game(
+            "Terraria",
+            "TestSeller",
+            15.00
+        )
     };
 
-    // Test 1: Game exists
-    Game* found_game = searchGame(games, "Minecraft");
+    // Test 1 - Existing game
+    Game* found_game =
+        searchGame(
+            games,
+            "Minecraft"
+        );
 
     if (found_game != nullptr)
     {
-        std::cout << "Search existing game: PASS" << std::endl;
+        std::cout
+            << "Search existing game: PASS"
+            << std::endl;
     }
     else
     {
-        std::cout << "Search existing game: FAIL" << std::endl;
+        std::cout
+            << "Search existing game: FAIL"
+            << std::endl;
     }
 
-    // Test 2: Game does not exist
-    Game* missing_game = searchGame(games, "NotExistGame");
+
+    // Test 2 - Missing game
+    Game* missing_game =
+        searchGame(
+            games,
+            "NotExistGame"
+        );
 
     if (missing_game == nullptr)
     {
-        std::cout << "Search missing game: PASS" << std::endl;
+        std::cout
+            << "Search missing game: PASS"
+            << std::endl;
     }
     else
     {
-        std::cout << "Search missing game: FAIL" << std::endl;
+        std::cout
+            << "Search missing game: FAIL"
+            << std::endl;
     }
+
+    std::cout << std::endl;
 }
+
 
 int main()
 {
+    // Test search function first
     testSearchFunction();
+
+
     // Find all test input files
     std::vector<std::string> test_files =
         findTestFiles("test_cases");
 
-    // Check if any tests were found
+
+    // Check whether tests exist
     if (test_files.empty())
     {
         std::cout
@@ -140,39 +281,52 @@ int main()
         return 0;
     }
 
+
     int passed_tests = 0;
     int failed_tests = 0;
 
-    std::cout << "=== TEST RESULTS ===" << std::endl;
+
+    std::cout
+        << "=== TEST RESULTS ==="
+        << std::endl;
+
     std::cout << std::endl;
 
+
     // Go through every test case
-    for (const std::string& input_file : test_files)
+    for (const std::string& input_file :
+         test_files)
     {
         fs::path input_path(input_file);
 
-        // Get the folder containing input.txt
+        // Folder containing the test
         fs::path test_directory =
             input_path.parent_path();
 
-        // Expected output file
+
+        // Expected output
         fs::path expected_file =
-            test_directory / "expected_output.txt";
+            test_directory /
+            "expected_output.txt";
 
-        // Actual output file
+
+        // Actual output
         fs::path actual_file =
-            test_directory / "actual_output.txt";
+            test_directory /
+            "actual_output.txt";
 
-        // Get a readable test name
+
         std::string test_name =
             test_directory.string();
+
 
         std::cout
             << "Test: "
             << test_name
             << std::endl;
 
-        // Check expected output exists
+
+        // Expected output must exist
         if (!fs::exists(expected_file))
         {
             std::cout
@@ -190,15 +344,23 @@ int main()
             continue;
         }
 
-        // Check actual output exists
-        if (!fs::exists(actual_file))
+
+        // Generate actual_output.txt
+        bool generated =
+            generateActualOutput(
+                input_file,
+                actual_file.string()
+            );
+
+
+        if (!generated)
         {
             std::cout
                 << "Result: FAIL"
                 << std::endl;
 
             std::cout
-                << "Reason: actual_output.txt not found"
+                << "Reason: Could not generate actual output"
                 << std::endl;
 
             failed_tests++;
@@ -208,11 +370,14 @@ int main()
             continue;
         }
 
-        // Compare expected and actual output
-        bool passed = compareFile(
-            expected_file.string(),
-            actual_file.string()
-        );
+
+        // Compare actual and expected output
+        bool passed =
+            compareFile(
+                expected_file.string(),
+                actual_file.string()
+            );
+
 
         if (passed)
         {
@@ -232,6 +397,71 @@ int main()
                 << "Reason: Expected and actual status do not match"
                 << std::endl;
 
+            // Show expected status
+            std::vector<std::string> expected_lines =
+                readFile(
+                    expected_file.string()
+                );
+
+            std::vector<std::string> actual_lines =
+                readFile(
+                    actual_file.string()
+                );
+
+            std::cout
+                << "Expected status: ";
+
+            if (containsStatus(
+                    expected_lines,
+                    "SUCCESS"))
+            {
+                std::cout
+                    << "SUCCESS"
+                    << std::endl;
+            }
+            else if (containsStatus(
+                         expected_lines,
+                         "FAILURE"))
+            {
+                std::cout
+                    << "FAILURE"
+                    << std::endl;
+            }
+            else
+            {
+                std::cout
+                    << "UNKNOWN"
+                    << std::endl;
+            }
+
+
+            std::cout
+                << "Actual status: ";
+
+            if (containsStatus(
+                    actual_lines,
+                    "SUCCESS"))
+            {
+                std::cout
+                    << "SUCCESS"
+                    << std::endl;
+            }
+            else if (containsStatus(
+                         actual_lines,
+                         "FAILURE"))
+            {
+                std::cout
+                    << "FAILURE"
+                    << std::endl;
+            }
+            else
+            {
+                std::cout
+                    << "UNKNOWN"
+                    << std::endl;
+            }
+
+
             failed_tests++;
         }
 
@@ -239,7 +469,7 @@ int main()
     }
 
 
-    // Display final results
+    // Final summary
     std::cout
         << "=== TEST SUMMARY ==="
         << std::endl;
@@ -260,12 +490,11 @@ int main()
         << std::endl;
 
 
-    // Return 0 if all tests passed
+    // Success only if every test passed
     if (failed_tests == 0)
     {
         return 0;
     }
 
-    // Return 1 if at least one test failed
     return 1;
 }
