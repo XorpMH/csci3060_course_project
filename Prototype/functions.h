@@ -166,36 +166,18 @@ bool refund(
 
 // Current User Accounts - new
 void currentUserAccountsConstructor(
-    std::vector<User>* users,
-    std::string file_path
+    std::vector<User>* users
 );
 
-std::vector<User> currentUserAccounts(
-    std::string file_path
-);
-
-
-// Current User Accounts - old compatible versions
-void currentUserAccountsConstructor();
-
-void currentUserAccounts();
+std::vector<User> currentUserAccounts();
 
 
 // Available Games - new
 void availableGamesConstructor(
-    std::vector<Game>* games,
-    std::string file_path
+    std::vector<Game>* games
 );
 
-std::vector<Game> availableGames(
-    std::string file_path
-);
-
-
-// Available Games - old compatible versions
-void availableGamesConstructor();
-
-void availableGames();
+std::vector<Game> availableGames();
 
 
 // Game Collection - new
