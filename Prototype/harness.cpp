@@ -91,9 +91,41 @@ bool compareFile(
     return false;
 }
 
+void testSearchFunction()
+{
+    std::vector<Game> games = {
+        Game("Minecraft", "Test game", 25.00),
+        Game("Terraria", "Test game", 15.00)
+    };
+
+    // Test 1: Game exists
+    Game* found_game = searchGame(games, "Minecraft");
+
+    if (found_game != nullptr)
+    {
+        std::cout << "Search existing game: PASS" << std::endl;
+    }
+    else
+    {
+        std::cout << "Search existing game: FAIL" << std::endl;
+    }
+
+    // Test 2: Game does not exist
+    Game* missing_game = searchGame(games, "NotExistGame");
+
+    if (missing_game == nullptr)
+    {
+        std::cout << "Search missing game: PASS" << std::endl;
+    }
+    else
+    {
+        std::cout << "Search missing game: FAIL" << std::endl;
+    }
+}
 
 int main()
 {
+    testSearchFunction();
     // Find all test input files
     std::vector<std::string> test_files =
         findTestFiles("test_cases");
