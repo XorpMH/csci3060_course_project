@@ -212,13 +212,60 @@ void sell(const std::string& gamename,
 
 
 // Purchase a game that is up for sale
-void buy(){
+bool buy(User& buyer, const Game& game)
+{
+    // Check if the buyer has enough credit
+    if (buyer.getCredit() < game.getGamePrice())
+    {
+        return false;
+    }
 
+    // Deduct the game price from the buyer
+    return buyer.deductCredit(game.getGamePrice());
 }
 
-// Refund a user's purchase
-void refund(){
 
+// Search for a game by name
+Game* searchGame(
+    std::vector<Game>& games,
+    const std::string& game_name
+)
+{
+    for (Game& game : games)
+    {
+        if (game.getGameName() == game_name)
+        {
+            return &game;
+        }
+    }
+
+    return nullptr;
+}
+
+
+// Refund a user's purchase
+bool refund(
+    User& buyer,
+    User& seller,
+    double amount
+)
+{
+    // Refund amount must be valid
+    if (amount <= 0)
+    {
+        return false;
+    }
+
+    // Check if the seller has enough credit
+    if (!seller.deductCredit(amount))
+    {
+        return false;
+    }
+
+    // Return the credit to the buyer
+    buyer.addCredit(amount);
+
+    return true;
 }
 
 //
@@ -795,4 +842,157 @@ std::string rtrim(std::string& s){
     s.erase(s.find_last_not_of(" \n\r\t") + 1);
     
     return s;
+}
+
+//
+// COMPATIBILITY FUNCTIONS FROM OLD VERSION
+//
+
+// Old listAccounts version
+void listAccounts(const std::vector<User>& users)
+{
+    if (users.empty())
+    {
+        std::cout << "No accounts found." << std::endl;
+        return;
+    }
+
+    for (const User& user : users)
+    {
+        std::cout << "Username: " << user.getUsername()
+                  << ", Type: " << user.getUserType()
+                  << ", Credit: $" << user.getCredit()
+                  << std::endl;
+    }
+}
+
+
+// Old createUser version using a pointer
+bool createUser(
+    User current_user,
+    std::vector<User>* users,
+    std::string username,
+    std::string password,
+    std::string email,
+    std::string type
+)
+{
+    if (users == nullptr)
+    {
+        return false;
+    }
+
+    // Use the new version
+    return createUser(
+        current_user,
+        *users,
+        username,
+        password,
+        email,
+        type
+    );
+}
+
+
+// Old deleteUser version using a pointer
+bool deleteUser(
+    User current_user,
+    std::vector<User>* users,
+    std::string username
+)
+{
+    if (users == nullptr)
+    {
+        return false;
+    }
+
+    // Use the new version
+    return deleteUser(
+        current_user,
+        *users,
+        username
+    );
+}
+
+
+// Old sell function
+void sell()
+{
+    // Kept for compatibility with old frontend code
+}
+
+
+// Old buy function
+bool buy(User& buyer, const Game& game)
+{
+    // Check if the buyer has enough credit
+    if (buyer.getCredit() < game.getGamePrice())
+    {
+        return false;
+    }
+
+    // Deduct the game price
+    return buyer.deductCredit(game.getGamePrice());
+}
+
+
+// Old refund function
+bool refund(
+    User& buyer,
+    User& seller,
+    double amount
+)
+{
+    // Check if seller has enough credit
+    if (!seller.deductCredit(amount))
+    {
+        return false;
+    }
+
+    // Give the credit back to buyer
+    buyer.addCredit(amount);
+
+    return true;
+}
+
+
+// Old currentUserAccountsConstructor
+void currentUserAccountsConstructor()
+{
+    // Kept for compatibility with old code
+}
+
+
+// Old currentUserAccounts
+void currentUserAccounts()
+{
+    std::string file_name = "";
+}
+
+
+// Old availableGamesConstructor
+void availableGamesConstructor()
+{
+    // Kept for compatibility with old code
+}
+
+
+// Old availableGames
+void availableGames()
+{
+    std::string file_name = "";
+}
+
+
+// Old gameCollectionConstructor
+void gameCollectionConstructor()
+{
+    // Kept for compatibility with old code
+}
+
+
+// Old gameCollection
+void gameCollection(User user)
+{
+    // Kept for compatibility with old code
 }
