@@ -424,7 +424,7 @@ void applyDailyTransactions(std::string file_path){
 
     // Apply each transaction to the corresponding file
     for(std::string transaction: transactions){
-        applyTransaction(transaction);
+        applyTransaction(file_path, transaction);
     }
 }
 
@@ -433,7 +433,7 @@ void applyDailyTransactions(std::string file_path){
 // XX UUUUUUUUUUUUUUU SSSSSSSSSSSSSSS CCCCCCCCC (05)
 // XX IIIIIIIIIIIIIIIIIII SSSSSSSSSSSSSSS PPPPPP (03)
 // XX IIIIIIIIIIIIIIIIIII SSSSSSSSSSSSSSS UUUUUUUUUUUUUUU PPPPPP (04)
-std::string applyTransaction(std::string transaction){
+std::string applyTransaction(std::string file_path, std::string transaction){
     // Grab the transaction type
     std::string code = transaction.substr(0,2);
     
@@ -447,12 +447,14 @@ std::string applyTransaction(std::string transaction){
 
             // Parse input values
             std::string username = rtrim(transaction.substr(3,15));
-            std::string userType = rtrim(transaction.substr(19,2));
+            std::string user_type = rtrim(transaction.substr(19,2));
             double credit = stod(transaction.substr(22,9));
 
-            // TODO: call logout, update corresponding files and return SUCCESS or FAILURE
-
-            break;
+            // TODO: replace hardcoded looged_in = true with the actual logged in state
+            bool logged_in = true;
+            logout(logged_in, username, user_type);
+            
+            return "SUCCESS";
         }
 
         // Create account
@@ -464,7 +466,7 @@ std::string applyTransaction(std::string transaction){
 
             // Parse input values
             std::string username = rtrim(transaction.substr(3,15));
-            std::string userType = rtrim(transaction.substr(19,2));
+            std::string user_type = rtrim(transaction.substr(19,2));
             double credit = stod(transaction.substr(22,9));
 
             // TODO: call createUser, update corresponding files and return SUCCESS or FAILURE
@@ -481,7 +483,7 @@ std::string applyTransaction(std::string transaction){
 
             // Parse input values
             std::string username = rtrim(transaction.substr(3,15));
-            std::string userType = rtrim(transaction.substr(19,2));
+            std::string user_type = rtrim(transaction.substr(19,2));
             double credit = stod(transaction.substr(22,9));
 
             // TODO: call deleteUser, update corresponding files and return SUCCESS or FAILURE
@@ -551,7 +553,7 @@ std::string applyTransaction(std::string transaction){
 
             // Parse input values
             std::string username = rtrim(transaction.substr(3,15));
-            std::string userType = rtrim(transaction.substr(19,2));
+            std::string user_type = rtrim(transaction.substr(19,2));
             double credit = stod(transaction.substr(22,9));
 
             // TODO: call addCredit, update corresponding files and return SUCCESS or FAILURE
@@ -560,7 +562,7 @@ std::string applyTransaction(std::string transaction){
         }
     }
 
-    return "";
+    return "FAILURE: No corresponding function";
 }
 
 //
