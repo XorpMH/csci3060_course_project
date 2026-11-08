@@ -1,85 +1,98 @@
-#include "user.h"
-#include "game.h"
 #include "functions.h"
-#include <iostream>
-#include <vector>
-#include <iostream>
+
+#include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
+#include <sstream>
 
-// Functionality variables
 namespace {
-    // The user currently logged in
-    User* cur_user = nullptr;
-    
-    // Default file paths
+    bool backend_logged_in = false;
+    std::string backend_username;
+    std::string backend_user_type;
+
     std::string daily_transactions_path = "assets/daily_transactions.txt";
     std::string user_accounts_path = "assets/user_accounts.txt";
     std::string available_games_path = "assets/available_games.txt";
     std::string game_collection_path = "assets/game_collection.txt";
+
+    User* findUser(std::vector<User>& users, const std::string& username)
+    {
+        for (User& user : users) {
+            if (user.getUsername() == username) {
+                return &user;
+            }
+        }
+        return nullptr;
+    }
 }
 
 // Login function
-bool login(const std::string &username,
-           std::vector<User> &users,
-           bool &logged_in,
-           std::string &current_username,
-           std::string &current_user_type)
+bool login(
+    const std::string& username,
+    const std::vector<User>& users,
+    bool& logged_in,
+    std::string& current_username,
+    std::string& current_user_type
+)
 {
-    // Check if a user is already logged in
-    if (logged_in)
-    {
+    if (logged_in) {
         std::cout << "Login failed: user is already logged in\n";
         return false;
     }
 
-    // Search for the username
-    for (User &user : users)
-    {
-        if (user.getUsername() == username)
-        {
+    for (const User& user : users) {
+        if (user.getUsername() == username) {
             logged_in = true;
             current_username = user.getUsername();
             current_user_type = user.getUserType();
-            
-            // Set the user as logged in for the backend
-            cur_user = &user;
+
+            backend_logged_in = true;
+            backend_username = current_username;
+            backend_user_type = current_user_type;
 
             std::cout << "Login successful\n";
             return true;
         }
     }
 
-    // Username was not found
     std::cout << "Login failed: user does not exist\n";
     return false;
 }
 
 // Logout function
-void logout(bool &logged_in,
-            std::string &current_username,
-            std::string &current_user_type)
+void logout(
+    bool& logged_in,
+    std::string& current_username,
+    std::string& current_user_type
+)
 {
-    if(logged_in){
-        logged_in = false;
-        current_username = "";
-        current_user_type = "";
-
-        // Forget the logged in user
-        cur_user = nullptr;
+    if (!logged_in) {
+        std::cout << "Logout failed: no user is logged in\n";
+        return;
     }
+
+    logged_in = false;
+    current_username.clear();
+    current_user_type.clear();
+
+    backend_logged_in = false;
+    backend_username.clear();
+    backend_user_type.clear();
+
+    std::cout << "Logout successful\n";
 }
 
-// listAccounts function
-void listAccounts(const std::vector<User>& users) {
-    if (users.empty())
-    {
+// List accounts
+void listAccounts(const std::vector<User>& users)
+{
+    if (users.empty()) {
         std::cout << "No accounts found." << std::endl;
         return;
     }
 
-    for (const User &user : users)
-    {
+    for (const User& user : users) {
         std::cout << "Username: " << user.getUsername()
                   << ", Type: " << user.getUserType()
                   << ", Credit: $" << user.getCredit()
@@ -88,25 +101,18 @@ void listAccounts(const std::vector<User>& users) {
 }
 
 // Create a new user account
-bool createUser(std::vector<User>& users, // Existing user list, passed by reference
-        std::string username, 
-        std::string type){
-    
-    // Confirm logged in
-    if (cur_user == nullptr){
+bool createUser(
+    std::vector<User>& users,
+    const std::string& username,
+    const std::string& type
+)
+{
+    if (!backend_logged_in || backend_user_type != "AA") {
         return false;
     }
 
-    // Confirm that the current user is an admin
-    if(!(cur_user->getUserType()=="AA")){
+    if (username.empty() || username.length() > 15) {
         return false;
-    }
-    
-    // Check that the user being created has a unique username
-    for(auto it = users.begin(); it != users.end(); it++){
-        if(it->getUsername()==username){
-            return false;
-        }
     }
 
     // Check user type format
@@ -114,73 +120,69 @@ bool createUser(std::vector<User>& users, // Existing user list, passed by refer
         return false;
     }
 
-    // Create the user
-    users.push_back(User(username, type));
-    // TODO: replace push_back with a constructing a transaction and adding it to the transactions list
+    for (const User& user : users) {
+        if (user.getUsername() == username) {
+            return false;
+        }
+    }
 
+    users.push_back(User(username, type));
     return true;
 }
 
-// Remove an existing user
-bool deleteUser(std::vector<User>& users,  // Existing user list, passed by reference
-        std::string username // The username of the user to delete
-    ){
-
-    // Confirm logged in
-    if (cur_user == nullptr){
+// Delete an existing user account
+bool deleteUser(
+    std::vector<User>& users,
+    const std::string& username
+)
+{
+    if (!backend_logged_in || backend_user_type != "AA") {
         return false;
     }
 
-    // Confirm that the current user is an admin
-    if(!(cur_user->getUserType()=="AA")){
+    // Do not allow the currently logged-in user to delete themselves
+    if (username == backend_username) {
         return false;
     }
-    
-    // Find and remove the user from the list
-    for(auto it = users.begin(); it != users.end(); it++){
-        if(it->getUsername()==username){
+
+    for (auto it = users.begin(); it != users.end(); ++it) {
+        if (it->getUsername() == username) {
             users.erase(it);
             return true;
         }
     }
-    // TODO: replace erase with a constructing a transaction and adding it to the transactions list
 
     return false;
 }
 
 // Put a game up for sale
-bool sell(const std::string& gamename,
-          const std::string& seller_name,
-          double gameprice,
-          std::vector<Game>& available_games)
+bool sell(
+    const std::string& gamename,
+    double gameprice,
+    const std::vector<Game>& available_games,
+    std::vector<Game>& pending_games
+)
 {
-
-    // Check if the user is logged in
-    if (cur_user == nullptr) {
+    if (!backend_logged_in) {
         std::cout << "Error: User must be logged in to sell a game.\n";
         return false;
     }
 
-    // Standard-buy accounts cannot sell games
-    if (cur_user->getUserType() == "BS") {
+    if (backend_user_type == "BS") {
         std::cout << "Error: Standard-buy accounts cannot sell games.\n";
         return false;
     }
 
-    // Check if the game name is valid
-    if (gamename.empty() || gamename.length() > 25) {
-        std::cout << "Error: Game name must be between 1 and 25 characters.\n";
+    if (gamename.empty() || gamename.length() > 19) {
+        std::cout << "Error: Game name must be between 1 and 19 characters.\n";
         return false;
     }
 
-    // Check if the price is valid
-    if (!std::isfinite(gameprice) ||
-        gameprice < 0 || gameprice > 999.99) {
+    if (!std::isfinite(gameprice) || gameprice < 0 || gameprice > 999.99) {
         std::cout << "Error: Game price must be between $0.00 and $999.99.\n";
         return false;
     }
 
-    // Check if the game name already exists
     for (const Game& game : available_games) {
         if (game.getGameName() == gamename) {
             std::cout << "Error: Game name already exists.\n";
@@ -188,26 +190,16 @@ bool sell(const std::string& gamename,
         }
     }
 
-    // Create a new game and add it to the available games vector
-    Game new_game(gamename, seller_name, gameprice);
-    available_games.push_back(new_game);
-    return true;
-}
-
-
-// Purchase a game that is up for sale
-bool buy(User& buyer, const Game& game)
-{
-    // Check if the buyer has enough credit
-    if (buyer.getCredit() < game.getGamePrice())
-    {
-        return false;
+    for (const Game& game : pending_games) {
+        if (game.getGameName() == gamename) {
+            std::cout << "Error: Game name already exists.\n";
+            return false;
+        }
     }
 
-    // Deduct the game price from the buyer
-    return buyer.deductCredit(game.getGamePrice());
+    pending_games.push_back(Game(gamename, backend_username, gameprice));
+    return true;
 }
-
 
 // Search for a game by name
 Game* searchGame(
@@ -215,10 +207,8 @@ Game* searchGame(
     const std::string& game_name
 )
 {
-    for (Game& game : games)
-    {
-        if (game.getGameName() == game_name)
-        {
+    for (Game& game : games) {
+        if (game.getGameName() == game_name) {
             return &game;
         }
     }
@@ -226,679 +216,650 @@ Game* searchGame(
     return nullptr;
 }
 
-
-// Refund a user's purchase
-bool refund(
-    User& buyer,
-    User& seller,
-    double amount
-)
+// Purchase a game
+bool buy(User& buyer, const Game& game)
 {
-    // Refund amount must be valid
-    if (amount <= 0)
-    {
+    if (buyer.getUserType() == "SS") {
         return false;
     }
 
-    // Check if the seller has enough credit
-    if (!seller.deductCredit(amount))
-    {
+    if (buyer.getCredit() < game.getGamePrice()) {
         return false;
     }
 
-    // Return the credit to the buyer
+    return buyer.deductCredit(game.getGamePrice());
+}
+
+// Refund a purchase
+bool refund(User& buyer, User& seller, double amount)
+{
+    if (amount <= 0) {
+        return false;
+    }
+
+    if (!seller.deductCredit(amount)) {
+        return false;
+    }
+
     buyer.addCredit(amount);
-
     return true;
 }
 
-//
-// FILE FUNCTIONS
-//
-
-// Build the file from a list of user accounts
-// UUUUUUUUUUUUUUU_TT_CCCCCCCCC
-void currentUserAccountsConstructor(std::vector<User>& users){
-    // Open file
+// Build the Current User Accounts file
+void currentUserAccountsConstructor(const std::vector<User>& users)
+{
     std::ofstream file(user_accounts_path);
 
-    // Write to file if open
-    if(file.is_open()){
+    if (!file.is_open()) {
+        return;
+    }
 
-        // Write a line for each user
-        for(auto it = users.begin(); it != users.end(); it++){
-            
-            // Write the username, and pad anything shorter than 15 characters
-            file << std::left << std::setw(15) << it->getUsername();
-            
-            file << " ";
-
-            // Write user type as a 2 letter capitalized string
-            file << it->getUserType();
-
-            file << " ";
-
-            // Write the user's credit, append .00 if it is an integer and write only 2 decimals
-            // TODO
-            if(it->getCredit() == static_cast<int>(it->getCredit())){
-                file << it->getCredit() << ".00";
-            }
-            else{
-                file << std::setprecision(2) << it->getCredit();
-            }
-
-            file << "\n";
-        }
-
-        // Close file
-        file.close();
+    for (const User& user : users) {
+        file << std::left
+             << std::setfill(' ')
+             << std::setw(15)
+             << user.getUsername().substr(0, 15) // Username
+             << " "
+             << std::setw(2)
+             << user.getUserType().substr(0, 2) // User type
+             << " "
+             << std::right
+             << std::setfill('0')
+             << std::setw(9)
+             << std::fixed
+             << std::setprecision(2)
+             << user.getCredit() // User's credit amount
+             << "\n";
     }
 }
 
-// Get a list of user accounts from the file
-std::vector<User> currentUserAccounts(){
-    std::vector<User> users = {};
+// Read the Current User Accounts file
+std::vector<User> currentUserAccounts()
+{
+    std::vector<User> users;
+    std::ifstream file(user_accounts_path);
 
-    try{
-        // Open file
-        std::ifstream file(user_accounts_path);
+    if (!file.is_open()) {
+        return users;
+    }
 
-        // Confirm that filepath exists/file is open
-        if(file.is_open()){
-            
-            // Loop through all lines and add users to the list
-            std::string line;
-            while(std::getline(file, line)){
-                
-                // Get user information from formatted line
-                std::string username = line.substr(0,15);
-                std::string user_type = line.substr(16,2);
-                double credits = std::stod(line.substr(19,9));
+    std::string line;
 
-                // Add user to list
-                users.push_back(User(username, user_type, credits));
+    while (std::getline(file, line)) {
+        if (line.size() < 28) {
+            continue;
+        }
+
+        try {
+            std::string username = rtrim(line.substr(0, 15));
+            std::string user_type = rtrim(line.substr(16, 2));
+            double credit = std::stod(line.substr(19, 9));
+
+            if (!username.empty() && username != "END") {
+                users.push_back(User(username, user_type, credit));
             }
-
-            // Close file
-            file.close();
+        }
+        catch (...) {
+            // Ignore malformed lines
         }
     }
-    catch(...){}
 
     return users;
 }
 
-// Build the file from a list of available games
-// IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS_PPPPPP
-void availableGamesConstructor(std::vector<Game> games){
-    // Open file
+// Build the Available Games file
+void availableGamesConstructor(const std::vector<Game>& games)
+{
     std::ofstream file(available_games_path);
 
-    // Write to file if open
-    if(file.is_open()){
+    if (!file.is_open()) {
+        return;
+    }
 
-        // Write a line for each game
-        for(auto it = games.begin(); it != games.end(); it++){
-            
-            // Write the game name and pad anything shorter than 19 characters
-            file << std::left << std::setw(19) << it->getGameName();
-            
-            file << " ";
-
-            // Write seller's username and pad anything shorter than 15 characters
-            file << std::left << std::setw(15) << it->getSellerName();
-
-            file << " ";
-
-            // Write the game price to 2 decimal places
-            file << std::left << std::setw(6) << std::fixed << std::setprecision(2) << it->getGamePrice();
-
-            file << "\n";
-        }
-
-        // Close file
-        file.close();
+    for (const Game& game : games) {
+        file << std::left
+             << std::setfill(' ')
+             << std::setw(19)
+             << game.getGameName().substr(0, 19) // Game name
+             << " "
+             << std::setw(15)
+             << game.getSellerName().substr(0, 15) // Seller name
+             << " "
+             << std::right
+             << std::setfill('0')
+             << std::setw(6)
+             << std::fixed
+             << std::setprecision(2)
+             << game.getGamePrice() // Game price
+             << "\n";
     }
 }
 
-// Get a list of games from the file
-std::vector<Game> availableGames(){
-    std::vector<Game> games = {};
+// Read the Available Games file
+std::vector<Game> availableGames()
+{
+    std::vector<Game> games;
+    std::ifstream file(available_games_path);
 
-    try{
-        // Open file
-        std::ifstream file(available_games_path);
+    if (!file.is_open()) {
+        return games;
+    }
 
-        // Confirm that filepath exists/file is open
-        if(file.is_open()){
-            
-            // Loop through all lines and add games to the list
-            std::string line;
-            while(std::getline(file, line)){
-                
-                // Get game information from formatted line
-                std::string game_name = rtrim(line.substr(0,19));
-                std::string seller_name = rtrim(line.substr(20,15));
-                double price = std::stod(rtrim(line.substr(36,6)));
+    std::string line;
 
-                // Add game to list
+    while (std::getline(file, line)) {
+        if (line.size() < 42) {
+            continue;
+        }
+
+        try {
+            std::string game_name = rtrim(line.substr(0, 19));
+            std::string seller_name = rtrim(line.substr(20, 15));
+            double price = std::stod(line.substr(36, 6));
+
+            if (!game_name.empty() && game_name != "END") {
                 games.push_back(Game(game_name, seller_name, price));
             }
-
-            // Close file
-            file.close();
+        }
+        catch (...) {
+            // Ignore malformed lines
         }
     }
-    catch(...){}
 
     return games;
 }
 
-// Append to the file containing ownership of games from a game and its owner, or create it if it doesn't exist
-// IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
-void appendGameCollection(Game game, User owner){
-    // Open file to append to it
+// Add ownership to the Game Collection file
+void appendGameCollection(const Game& game, const User& owner)
+{
     std::ofstream file(game_collection_path, std::ios::app);
 
-    // Write to file if open
-    if(file.is_open()){
-        
-        // Write the game name and pad anything shorter than 19 characters
-        file << std::left << std::setw(19) << game.getGameName();
+    if (!file.is_open()) {
+        return;
+    }
 
-        file << " ";
+    file << std::left
+         << std::setfill(' ')
+         << std::setw(19)
+         << game.getGameName().substr(0, 19)
+         << " "
+         << std::setw(15)
+         << owner.getUsername().substr(0, 15)
+         << "\n";
+}
 
-        // Write the owner's name and pad anything shorter than 15 characters
-        file << std::left << std::setw(15) << owner.getUsername();
+// Remove ownership from the Game Collection file
+void removeGameCollection(const Game& game, const User& owner)
+{
+    std::vector<std::string> lines = readFile(game_collection_path);
+    std::ofstream file(game_collection_path);
 
-        file << "\n";
+    if (!file.is_open()) {
+        return;
+    }
 
-        // Close file
-        file.close();
+    for (const std::string& line : lines) {
+        if (line.size() < 35) {
+            continue;
+        }
+
+        std::string game_name = rtrim(line.substr(0, 19));
+        std::string username = rtrim(line.substr(20, 15));
+
+        if (game.getGameName() == game_name &&
+            owner.getUsername() == username) {
+            continue;
+        }
+
+        file << line << "\n";
     }
 }
 
-// Remove a game from a user's ownership
-// IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
-void removeGameCollection(Game game, User owner){
-    // Open original file
-    std::ifstream inFile(game_collection_path);
-    std::vector<std::string> lines = {};
+// Get games owned by a user
+std::vector<Game> gameCollection(
+    const std::vector<Game>& available_games,
+    const User& owner
+)
+{
+    std::vector<Game> games;
+    std::ifstream file(game_collection_path);
 
-    // Read all lines from file
-    if(inFile.is_open()){
-        
-        // Loop through all lines and save them to the list
-        std::string line;
-        while(std::getline(inFile, line)){
-            
-            // Add line to list 
-            lines.push_back(line);
-        }
-
-        // Close original file
-        inFile.close();
+    if (!file.is_open()) {
+        return games;
     }
 
-    // Open overwrite file
-    std::ofstream outFile(game_collection_path);
+    std::string line;
 
-    // Write to file if open
-    if(outFile.is_open()){
-        
-        // Find the line to remove
-        for(int i = 0; i < lines.size(); i++){
-            
-            // Construct game name and username
-            std::string game_name = rtrim(lines[i].substr(0,19));
-            std::string username = rtrim(lines[i].substr(20,15));
-
-            // Write everything except the ownership to remove
-            if(game.getGameName() == game_name && owner.getUsername() == username){
-                // Do nothing
-            }
-            else{
-                outFile << lines[i] << "\n";
-            }
+    while (std::getline(file, line)) {
+        if (line.size() < 35) {
+            continue;
         }
 
-        // Close file
-        outFile.close();
-    }
-}
+        std::string game_name = rtrim(line.substr(0, 19));
+        std::string username = rtrim(line.substr(20, 15));
 
-// Get a list of owned games owned by a specific user
-std::vector<Game> gameCollection(const std::vector<Game>& available_games, User owner, std::string file_path){
-    std::vector<Game> games = {};
-
-    // Open file
-    std::ifstream file(file_path);
-
-    // Read all lines from file
-    if(file.is_open()){
-        
-        // Loop through all lines and save them to the list
-        std::string line;
-        while(std::getline(file, line)){
-            
-            // Construct game name and username
-            std::string game_name = rtrim(line.substr(0,19));
-            std::string username = rtrim(line.substr(20,15));
-
-            // Check if the owner is the user
-            if(owner.getUsername() != username){
-                continue;
-            }
-
-            // Check if the game exists
-            for(int i = 0; i < available_games.size(); i++){
-                if(available_games[i].getGameName() == game_name){
-                    // Add the game to the vector
-                    games.push_back(available_games[i]);
-                    break;
-                }
-            }
+        if (owner.getUsername() != username) {
+            continue;
         }
 
-        // Close file
-        file.close();
+        for (const Game& game : available_games) {
+            if (game.getGameName() == game_name) {
+                games.push_back(game);
+                break;
+            }
+        }
     }
 
     return games;
 }
 
-// Create the daily transactions file at logout
-void dailyTransactionsConstructor(std::vector<std::string> transactions, std::string file_path){
-    // Write all transactions line-by-line into the file
+// Create the Daily Transactions file
+void dailyTransactionsConstructor(
+    const std::vector<std::string>& transactions,
+    const std::string& file_path
+)
+{
     writeFile(file_path, transactions);
 }
 
-// Apply individual transactions from the daily transactions file
-void applyDailyTransactions(std::string file_path){
-    // Get all transactions as strings
+// Apply every transaction from a file
+void applyDailyTransactions(const std::string& file_path)
+{
     std::vector<std::string> transactions = readFile(file_path);
 
-    // Apply each transaction to the corresponding file
-    for(std::string transaction: transactions){
-        applyTransaction(transaction);
+    for (const std::string& transaction : transactions) {
+        std::cout << applyTransaction(transaction) << std::endl;
     }
 }
 
-// Apply a single transaction
-// XX UUUUUUUUUUUUUUU TT CCCCCCCCC (01, 02, 06, 00)
-// XX UUUUUUUUUUUUUUU SSSSSSSSSSSSSSS CCCCCCCCC (05)
-// XX IIIIIIIIIIIIIIIIIII SSSSSSSSSSSSSSS PPPPPP (03)
-// XX IIIIIIIIIIIIIIIIIII SSSSSSSSSSSSSSS UUUUUUUUUUUUUUU PPPPPP (04)
-std::string applyTransaction(std::string transaction){
-    // Grab the transaction type
-    std::string code = transaction.substr(0,2);
-    
-    switch(stoi(code)){
-        // Log out / end of session
-        case 0: {
-            // Confirm correct length
-            if(transaction.length() != 31){
-                return "FAILURE: Improper format";
-            }
+// Apply one transaction
+std::string applyTransaction(const std::string& transaction)
+{
+    if (transaction.size() < 2) {
+        return "FAILURE: Improper format";
+    }
 
-            // TODO: add any input checking here
+    try {
+        int code = std::stoi(transaction.substr(0, 2));
 
-            // Parse input values
-            std::string username = rtrim(transaction.substr(3,15));
-            std::string user_type = rtrim(transaction.substr(19,2));
-            double credit = stod(transaction.substr(22,9));
+        switch (code) {
+          case 0: {
+                // Confirm format
+                if (transaction.length() != 31) {
+                    return "FAILURE: Improper format";
+                }
 
-            // Attempt to log out
-            bool logged_in = cur_user != nullptr;
-            bool temp = logged_in;
-            logout(logged_in, username, user_type);
-            
-            if (logged_in != temp){
-                return "FAILURE: Already logged in";
-            }
-            return "SUCCESS: Transaction accepted";
-        }
+                if (!backend_logged_in) {
+                    return "FAILURE: User is not logged in";
+                }
 
-        // Create account
-        case 1: {
-            // Confirm correct length
-            if(transaction.length() != 31){
-                return "FAILURE: Improper format";
-            }
+                // Parse transaction info
+                std::string username = rtrim(transaction.substr(3, 15));
+                std::string user_type = rtrim(transaction.substr(19, 2));
 
-            // TODO: add any input checking here
+                // Attempt logout
+                bool logged_in = true;
+                logout(logged_in, username, user_type);
 
-            // Parse input values
-            std::string username = rtrim(transaction.substr(3,15));
-            std::string user_type = rtrim(transaction.substr(19,2));
-            double credit = stod(transaction.substr(22,9));
-
-            // Delete a user from the user_accounts file
-            std::vector<User> users = currentUserAccounts();
-            if(createUser(users, username, user_type)){
-                // Rebuild current_user_accounts file
-                currentUserAccountsConstructor(users);
                 return "SUCCESS: Transaction accepted";
             }
-            else{
-                return "FAILURE: Transaction denied";
+
+            case 1: {
+                // Confirm format
+                if (transaction.length() != 31) {
+                    return "FAILURE: Improper format";
+                }
+
+                // Parse transaction information
+                std::string username = rtrim(transaction.substr(3, 15));
+                std::string user_type = rtrim(transaction.substr(19, 2));
+                double credit = std::stod(transaction.substr(22, 9));
+
+                std::vector<User> users = currentUserAccounts();
+
+                // Check existing users for duplicate
+                for (const User& user : users) {
+                    if (user.getUsername() == username) {
+                        return "FAILURE: Transaction denied";
+                    }
+                }
+
+                // Check user type and empty username
+                if (!typeValid(user_type) || username.empty() ||
+                    username.length() > 15 || credit != 0.0) {
+                    return "FAILURE: Transaction denied";
+                }
+                
+                // Add user and rebuild user accounts
+                users.push_back(User(username, user_type, credit));
+                currentUserAccountsConstructor(users);
+
+                return "SUCCESS: Transaction completed";
             }
-        }
 
-        // Delete account
-        case 2: {
-            // Confirm correct length
-            if(transaction.length() != 31){
-                return "FAILURE: Improper format";
-            }
+            case 2: {
+                // Confirm format
+                if (transaction.length() != 31) {
+                    return "FAILURE: Improper format";
+                }
 
-            // TODO: add any input checking here
+                // Parse transaction info and user accounts
+                std::string username = rtrim(transaction.substr(3, 15));
+                std::vector<User> users = currentUserAccounts();
 
-            // Parse input values
-            std::string username = rtrim(transaction.substr(3,15));
-            std::string user_type = rtrim(transaction.substr(19,2));
-            double credit = stod(transaction.substr(22,9));
+                bool removed = false;
+                
+                // Remove if it exists
+                for (auto it = users.begin(); it != users.end(); ++it) {
+                    if (it->getUsername() == username) {
+                        users.erase(it);
+                        removed = true;
+                        break;
+                    }
+                }
 
-            // Delete a user from the user_accounts file
-            std::vector<User> users = currentUserAccounts();
-            if(deleteUser(users, username)){
+                // Not removed failure
+                if (!removed) {
+                    return "FAILURE: Transaction denied";
+                }
+
                 // Rebuild current_user_accounts file
                 currentUserAccountsConstructor(users);
-                return "SUCCESS: Transaction accepted";
-            }
-            else{
-                return "FAILURE: Transaction denied";
-            }
-        }
-
-        // Put a game up for sale
-        case 3: {
-            // Confirm correct length
-            if(transaction.length() != 45){
-                return "FAILURE: Improper format";
+                return "SUCCESS: Transaction completed";
             }
 
-            // TODO: add any input checking here
+            case 3: {
+                // Confirm format
+                if (transaction.length() != 45) {
+                    return "FAILURE: Improper format";
+                }
 
-            // Parse input values
-            std::string game_name = rtrim(transaction.substr(3,19));
-            std::string seller_name = rtrim(transaction.substr(23,15));
-            double price = stod(transaction.substr(39,6));
+                // Parse transaction info
+                std::string game_name = rtrim(transaction.substr(3, 19));
+                std::string seller_name = rtrim(transaction.substr(23, 15));
+                double price = std::stod(transaction.substr(39, 6));
 
-            // Add a game to the available_games file
-            std::vector<Game> games = availableGames();
-            if(sell(game_name, seller_name, price, games)){
-                // Rebuild available_games file
+                // Check game price, name, and seller name
+                if (game_name.empty() || game_name.length() > 19 ||
+                    seller_name.empty() ||
+                    price < 0 || price > 999.99) {
+                    return "FAILURE: Transaction denied";
+                }
+
+                std::vector<Game> games = availableGames();
+                
+                // Check duplicate games
+                for (const Game& game : games) {
+                    if (game.getGameName() == game_name) {
+                        return "FAILURE: Transaction denied";
+                    }
+                }
+
+                // Add game and rebuild available_games file
+                games.push_back(Game(game_name, seller_name, price));
                 availableGamesConstructor(games);
-                return "SUCCESS: Transaction accepted";
-            }
-            return "FAILURE: Transaction denied";
-        }
 
-        // Buy a game
-        case 4: {
-            // Confirm correct length
-            if(transaction.length() != 61){
-                return "FAILURE: Improper format";
+                return "SUCCESS: Transaction completed";
             }
 
-            // TODO: add any input checking here
-
-            // Parse input values
-            std::string game_name = rtrim(transaction.substr(3,19));
-            std::string seller_name = rtrim(transaction.substr(23,15));
-            std::string buyer_name = rtrim(transaction.substr(39,15));
-            double price = stod(transaction.substr(55,6));
-
-            // Get users and games from files
-            std::vector<User> users = currentUserAccounts();
-            std::vector<Game> games = availableGames();
-
-            // Pointers to find the desired user and game
-            User* user_to_buy = nullptr;
-            Game* game_to_buy = nullptr;
-
-            // Find the user if it exists
-            for(User& user : users){
-                if(user.getUsername()==buyer_name){
-                    user_to_buy = &user;
-                    continue;
+            case 4: {
+                // Confirm format
+                if (transaction.length() != 61) {
+                    return "FAILURE: Improper format";
                 }
-            }
-            // Find the game if it exists
-            for(Game game : games){
-                if(game.getGameName()==game_name && game.getSellerName()==seller_name){
-                    game_to_buy = &game;
-                    continue;
+
+                // Parse transaction info
+                std::string game_name = rtrim(transaction.substr(3, 19));
+                std::string seller_name = rtrim(transaction.substr(23, 15));
+                std::string buyer_name = rtrim(transaction.substr(39, 15));
+                double price = std::stod(transaction.substr(55, 6));
+
+                // Parse available_games and current_user_accounts files
+                std::vector<Game> games = availableGames();
+                std::vector<User> users = currentUserAccounts();
+
+                // Find corresponding accounts and game
+                Game* game = searchGame(games, game_name);
+                User* buyer = findUser(users, buyer_name);
+                User* seller = findUser(users, seller_name);
+
+                // Confirm that they exist
+                if (game == nullptr || buyer == nullptr || seller == nullptr) {
+                    return "FAILURE: Transaction denied";
                 }
-            }
 
-            // Only run buy if both the user and game exist
-            if(user_to_buy == nullptr){
-                return "FAILURE: No matching user";
-            }
-            else if(game_to_buy == nullptr){
-                return "FAILURE: No matching game";
-            }
-            else{
-                // Run the buy function
-                if(buy(*user_to_buy, *game_to_buy)){
-                    // Rebuild current_user_accounts file
-                    currentUserAccountsConstructor(users);
-                    return "SUCCESS: Transaction accepted";
+                // Confirm credit and user type
+                if (buyer->getUserType() == "SS" ||
+                    buyer->getCredit() < price) {
+                    return "FAILURE: Transaction denied";
                 }
-                return "FAILURE: Transaction denied";
-            }
-        }
 
-        // Refund a game
-        case 5: {
-            // Confirm correct length
-            if(transaction.length() != 44){
-                return "FAILURE: Improper format";
-            }
-
-            // TODO: add any input checking here
-
-            // Parse input values
-            std::string buyer_name = rtrim(transaction.substr(3,15));
-            std::string seller_name = rtrim(transaction.substr(19,15));
-            double refund_credit = stod(transaction.substr(35,9));
-
-            // Get users and games from files
-            std::vector<User> users = currentUserAccounts();
-            std::vector<Game> games = availableGames();
-
-            // Pointers to find the desired users
-            User* buyer_to_refund = nullptr;
-            User* seller_to_charge = nullptr;
-
-            // Find the users if they exist
-            for(User& user : users){
-                if(user.getUsername()==buyer_name){
-                    buyer_to_refund = &user;
-                    continue;
+                // Confirm that the cost can be deducted
+                if (!buyer->deductCredit(price)) {
+                    return "FAILURE: Transaction denied";
                 }
-                else if(user.getUsername()==seller_name){
-                    seller_to_charge = &user;
-                    continue;
+
+                // Add the credit
+                seller->addCredit(price);
+
+                // Rebuild user_accounts file
+                currentUserAccountsConstructor(users);
+                appendGameCollection(*game, *buyer);
+
+                return "SUCCESS: Transaction completed";
+            }
+
+            case 5: {
+                // Confirm format
+                if (transaction.length() != 44) {
+                    return "FAILURE: Improper format";
                 }
-            }
 
-            // Only run buy if both the user and game exist
-            if(buyer_to_refund == nullptr){
-                return "FAILURE: No matching buyer";
-            }
-            if(seller_to_charge == nullptr){
-                return "FAILURE: No matching seller";
-            }
-            
-            // Run the buy function
-            if(refund(*buyer_to_refund, *seller_to_charge, refund_credit)){
-                return "SUCCESS: Transaction accepted";
-            }
-            return "FAILURE: Transaction denied";
-        }
+                // Parse transaction info
+                std::string buyer_name = rtrim(transaction.substr(3, 15));
+                std::string seller_name = rtrim(transaction.substr(19, 15));
+                double refund_credit = std::stod(transaction.substr(35, 9));
 
-        // Add credit to a user
-        case 6: {
-            // Confirm correct length
-            if(transaction.length() != 31){
-                return "FAILURE: Improper format";
-            }
-
-            // TODO: add any input checking here
-
-            // Parse input values
-            std::string username = rtrim(transaction.substr(3,15));
-            std::string user_type = rtrim(transaction.substr(19,2));
-            double credit = stod(transaction.substr(22,9));
-
-            // Get users from files
-            std::vector<User> users = currentUserAccounts();
-
-            // Pointer to find the desired user
-            User* user_to_pay = nullptr;
-
-            // Find the users if they exist
-            for(User& user : users){
-                if(user.getUsername()==username){
-                    user_to_pay = &user;
-                    continue;
+                std::vector<User> users = currentUserAccounts();
+                
+                // Find corresponding users
+                User* buyer = findUser(users, buyer_name);
+                User* seller = findUser(users, seller_name);
+                
+                // Confirm that users exist
+                if (buyer == nullptr || seller == nullptr ||
+                    refund_credit <= 0) {
+                    return "FAILURE: Transaction denied";
                 }
+
+                // Refund fails
+                if (!refund(*buyer, *seller, refund_credit)) {
+                    return "FAILURE: Transaction denied";
+                }
+
+                // Rebuild current_user_file
+                currentUserAccountsConstructor(users);
+                return "SUCCESS: Transaction completed";
             }
 
-            // Confirm that the user exists
-            if(user_to_pay == nullptr){
-                return "FAILURE: No matching user";
+            case 6: {
+                //Confirm format
+                if (transaction.length() != 31) {
+                    return "FAILURE: Improper format";
+                }
+
+                // Parse transaction info
+                std::string username = rtrim(transaction.substr(3, 15));
+                double credit = std::stod(transaction.substr(22, 9));
+
+                // Check valid price
+                if (credit <= 0 || credit > 1000.00) {
+                    return "FAILURE: Transaction denied";
+                }
+
+                // Get users and find corresponding user
+                std::vector<User> users = currentUserAccounts();
+                User* user = findUser(users, username);
+
+                // Check user's existence
+                if (user == nullptr) {
+                    return "FAILURE: Transaction denied";
+                }
+  
+                // Add credit to user
+                user->addCredit(credit);
+                currentUserAccountsConstructor(users);
+
+                return "SUCCESS: Transaction completed";
             }
-            
-            // Add credit to the user
-            user_to_pay->addCredit(credit);
-            return "SUCCESS: Transaction accepted";
+
+            default:
+                return "FAILURE: No corresponding transaction";
         }
     }
-
-    return "FAILURE: No corresponding transaction";
+    catch (...) {
+        return "FAILURE: Improper format";
+    }
 }
 
-//
-// SETTERS AND GETTERS FOR FILE PATHS
-//
+// File path setters/getters
+void setDailyTransactionsPath(const std::string& path)
+{
+    daily_transactions_path = path;
+}
 
-void setDailyTransactionsPath(std::string path) {daily_transactions_path = path;}
-void setUserAccountsPath(std::string path) {user_accounts_path = path;}
-void setAvailableGamesPath(std::string path) {available_games_path = path;}
-void setGameCollectionPath(std::string path) {game_collection_path = path;}
+void setUserAccountsPath(const std::string& path)
+{
+    user_accounts_path = path;
+}
 
-std::string getDailyTransactionsPath(){return daily_transactions_path;}
-std::string getUserAccountsPath(){return user_accounts_path;}
-std::string getAvailableGamesPath(){return available_games_path;}
-std::string getGameCollectionPath(){return game_collection_path;}
+void setAvailableGamesPath(const std::string& path)
+{
+    available_games_path = path;
+}
 
+void setGameCollectionPath(const std::string& path)
+{
+    game_collection_path = path;
+}
 
-//
-// HELPER FUNCTIONS
-//
+std::string getDailyTransactionsPath()
+{
+    return daily_transactions_path;
+}
 
-// Append a line to a file helper
-void appendToFile(std::string file_path, std::string line){
-    // Open file to append to it
+std::string getUserAccountsPath()
+{
+    return user_accounts_path;
+}
+
+std::string getAvailableGamesPath()
+{
+    return available_games_path;
+}
+
+std::string getGameCollectionPath()
+{
+    return game_collection_path;
+}
+
+// Append one line to a file
+void appendToFile(
+    const std::string& file_path,
+    const std::string& line
+)
+{
     std::ofstream file(file_path, std::ios::app);
 
-    // Write to file if open
-    if(file.is_open()){
-        
-        // Add line to end of file
+    if (file.is_open()) {
         file << line << "\n";
-
-        // Close file
-        file.close();
     }
 }
 
-// Remove a line from a file helper
-void removeFromFile(const std::string& file_path, const std::string& line_to_remove){
-    // Open original file
+// Remove one exact line from a file
+void removeFromFile(
+    const std::string& file_path,
+    const std::string& line_to_remove
+)
+{
     std::vector<std::string> lines = readFile(file_path);
+    std::ofstream file(file_path);
 
-    // Open overwrite file
-    std::ofstream outFile(file_path);
+    if (!file.is_open()) {
+        return;
+    }
 
-    // Write to file if open
-    if(outFile.is_open()){
-        
-        // Find the line to remove
-        for(int i = 0; i < lines.size(); i++){
-            
-            // Write everything except the line to remove
-            if(lines[i] == line_to_remove){
-                // Do nothing
-            }
-            else{
-                outFile << lines[i] << "\n";
-            }
+    for (const std::string& line : lines) {
+        if (line != line_to_remove) {
+            file << line << "\n";
         }
-
-        // Close file
-        outFile.close();
     }
 }
 
-// Read all lines from a file helper
-std::vector<std::string> readFile(const std::string& file_path){
-    std::vector<std::string> lines = {};
+// Read all lines from a file
+std::vector<std::string> readFile(const std::string& file_path)
+{
+    std::vector<std::string> lines;
+    std::ifstream file(file_path);
 
-    // Open file
-    std::ifstream inFile(file_path);
+    if (!file.is_open()) {
+        return lines;
+    }
 
-    // Read all lines from file
-    if(inFile.is_open()){
-        
-        // Loop through all lines and save them to the list
-        std::string line;
-        while(std::getline(inFile, line)){
-            
-            // Add line to list 
-            lines.push_back(line);
-        }
+    std::string line;
 
-        // Close original file
-        inFile.close();
+    while (std::getline(file, line)) {
+        lines.push_back(line);
     }
 
     return lines;
 }
 
-// Write all lines to a file helper
-void writeFile(const std::string& file_path, const std::vector<std::string>& lines){
-    // Open file
+// Write all lines to a file
+void writeFile(
+    const std::string& file_path,
+    const std::vector<std::string>& lines
+)
+{
     std::ofstream file(file_path);
 
-    // Write to file if open
-    if(file.is_open()){
+    if (!file.is_open()) {
+        return;
+    }
 
-        // Write each line
-        for(std::string line : lines){
-            
-            // Write line to the file
-            file << line << "\n";
-        }
-
-        // Close file
-        file.close();
+    for (const std::string& line : lines) {
+        file << line << "\n";
     }
 }
 
-// Requirements for a valid user type
-bool typeValid(std::string type){
-    return (type == "AA" || type == "FS" || type == "BS" || type == "SS");
+// Validation helpers
+bool passwordValid(const std::string& password)
+{
+    return !password.empty();
 }
 
-// Trim right
-std::string rtrim(std::string s){
-    // Line taken from stack overflow https://stackoverflow.com/questions/216823/how-can-i-trim-a-stdstring
-    s.erase(s.find_last_not_of(" \n\r\t") + 1);
-    
+bool emailValid(const std::string& email)
+{
+    return !email.empty() && email.find('@') != std::string::npos;
+}
+
+bool typeValid(const std::string& type)
+{
+    return type == "AA" ||
+           type == "FS" ||
+           type == "BS" ||
+           type == "SS";
+}
+
+// Trim whitespace from the right side
+std::string rtrim(std::string s)
+{
+    const std::size_t end = s.find_last_not_of(" \n\r\t");
+
+    if (end == std::string::npos) {
+        return "";
+    }
+
+    s.erase(end + 1);
     return s;
 }
