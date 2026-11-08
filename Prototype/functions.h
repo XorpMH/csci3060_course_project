@@ -137,11 +137,6 @@ void sell(
     std::vector<Game>& pending_games
 );
 
-
-// Sell - old compatible version
-void sell();
-
-
 // Search for a game
 Game* searchGame(
     std::vector<Game>& games,
