@@ -115,7 +115,8 @@ bool createUser(
         return false;
     }
 
-    if (!typeValid(type)) {
+    // Check user type format
+    if(!typeValid(type)){
         return false;
     }
 
@@ -257,17 +258,17 @@ void currentUserAccountsConstructor(const std::vector<User>& users)
         file << std::left
              << std::setfill(' ')
              << std::setw(15)
-             << user.getUsername().substr(0, 15)
+             << user.getUsername().substr(0, 15) // Username
              << " "
              << std::setw(2)
-             << user.getUserType().substr(0, 2)
+             << user.getUserType().substr(0, 2) // User type
              << " "
              << std::right
              << std::setfill('0')
              << std::setw(9)
              << std::fixed
              << std::setprecision(2)
-             << user.getCredit()
+             << user.getCredit() // User's credit amount
              << "\n";
     }
 }
@@ -319,17 +320,17 @@ void availableGamesConstructor(const std::vector<Game>& games)
         file << std::left
              << std::setfill(' ')
              << std::setw(19)
-             << game.getGameName().substr(0, 19)
+             << game.getGameName().substr(0, 19) // Game name
              << " "
              << std::setw(15)
-             << game.getSellerName().substr(0, 15)
+             << game.getSellerName().substr(0, 15) // Seller name
              << " "
              << std::right
              << std::setfill('0')
              << std::setw(6)
              << std::fixed
              << std::setprecision(2)
-             << game.getGamePrice()
+             << game.getGamePrice() // Game price
              << "\n";
     }
 }
@@ -482,7 +483,8 @@ std::string applyTransaction(const std::string& transaction)
         int code = std::stoi(transaction.substr(0, 2));
 
         switch (code) {
-            case 0: {
+          case 0: {
+                // Confirm format
                 if (transaction.length() != 31) {
                     return "FAILURE: Improper format";
                 }
@@ -491,37 +493,44 @@ std::string applyTransaction(const std::string& transaction)
                     return "FAILURE: User is not logged in";
                 }
 
+                // Parse transaction info
                 std::string username = rtrim(transaction.substr(3, 15));
                 std::string user_type = rtrim(transaction.substr(19, 2));
 
+                // Attempt logout
                 bool logged_in = true;
                 logout(logged_in, username, user_type);
 
-                return "SUCCESS: Transaction completed";
+                return "SUCCESS: Transaction accepted";
             }
 
             case 1: {
+                // Confirm format
                 if (transaction.length() != 31) {
                     return "FAILURE: Improper format";
                 }
 
+                // Parse transaction information
                 std::string username = rtrim(transaction.substr(3, 15));
                 std::string user_type = rtrim(transaction.substr(19, 2));
                 double credit = std::stod(transaction.substr(22, 9));
 
                 std::vector<User> users = currentUserAccounts();
 
+                // Check existing users for duplicate
                 for (const User& user : users) {
                     if (user.getUsername() == username) {
                         return "FAILURE: Transaction denied";
                     }
                 }
 
+                // Check user type and empty username
                 if (!typeValid(user_type) || username.empty() ||
                     username.length() > 15 || credit != 0.0) {
                     return "FAILURE: Transaction denied";
                 }
-
+                
+                // Add user and rebuild user accounts
                 users.push_back(User(username, user_type, credit));
                 currentUserAccountsConstructor(users);
 
@@ -529,15 +538,18 @@ std::string applyTransaction(const std::string& transaction)
             }
 
             case 2: {
+                // Confirm format
                 if (transaction.length() != 31) {
                     return "FAILURE: Improper format";
                 }
 
+                // Parse transaction info and user accounts
                 std::string username = rtrim(transaction.substr(3, 15));
                 std::vector<User> users = currentUserAccounts();
 
                 bool removed = false;
-
+                
+                // Remove if it exists
                 for (auto it = users.begin(); it != users.end(); ++it) {
                     if (it->getUsername() == username) {
                         users.erase(it);
@@ -546,23 +558,28 @@ std::string applyTransaction(const std::string& transaction)
                     }
                 }
 
+                // Not removed failure
                 if (!removed) {
                     return "FAILURE: Transaction denied";
                 }
 
+                // Rebuild current_user_accounts file
                 currentUserAccountsConstructor(users);
                 return "SUCCESS: Transaction completed";
             }
 
             case 3: {
+                // Confirm format
                 if (transaction.length() != 45) {
                     return "FAILURE: Improper format";
                 }
 
+                // Parse transaction info
                 std::string game_name = rtrim(transaction.substr(3, 19));
                 std::string seller_name = rtrim(transaction.substr(23, 15));
                 double price = std::stod(transaction.substr(39, 6));
 
+                // Check game price, name, and seller name
                 if (game_name.empty() || game_name.length() > 19 ||
                     seller_name.empty() ||
                     price < 0 || price > 999.99) {
@@ -570,13 +587,15 @@ std::string applyTransaction(const std::string& transaction)
                 }
 
                 std::vector<Game> games = availableGames();
-
+                
+                // Check duplicate games
                 for (const Game& game : games) {
                     if (game.getGameName() == game_name) {
                         return "FAILURE: Transaction denied";
                     }
                 }
 
+                // Add game and rebuild available_games file
                 games.push_back(Game(game_name, seller_name, price));
                 availableGamesConstructor(games);
 
@@ -584,37 +603,46 @@ std::string applyTransaction(const std::string& transaction)
             }
 
             case 4: {
+                // Confirm format
                 if (transaction.length() != 61) {
                     return "FAILURE: Improper format";
                 }
 
+                // Parse transaction info
                 std::string game_name = rtrim(transaction.substr(3, 19));
                 std::string seller_name = rtrim(transaction.substr(23, 15));
                 std::string buyer_name = rtrim(transaction.substr(39, 15));
                 double price = std::stod(transaction.substr(55, 6));
 
+                // Parse available_games and current_user_accounts files
                 std::vector<Game> games = availableGames();
                 std::vector<User> users = currentUserAccounts();
 
+                // Find corresponding accounts and game
                 Game* game = searchGame(games, game_name);
                 User* buyer = findUser(users, buyer_name);
                 User* seller = findUser(users, seller_name);
 
+                // Confirm that they exist
                 if (game == nullptr || buyer == nullptr || seller == nullptr) {
                     return "FAILURE: Transaction denied";
                 }
 
+                // Confirm credit and user type
                 if (buyer->getUserType() == "SS" ||
                     buyer->getCredit() < price) {
                     return "FAILURE: Transaction denied";
                 }
 
+                // Confirm that the cost can be deducted
                 if (!buyer->deductCredit(price)) {
                     return "FAILURE: Transaction denied";
                 }
 
+                // Add the credit
                 seller->addCredit(price);
 
+                // Rebuild user_accounts file
                 currentUserAccountsConstructor(users);
                 appendGameCollection(*game, *buyer);
 
@@ -622,51 +650,63 @@ std::string applyTransaction(const std::string& transaction)
             }
 
             case 5: {
+                // Confirm format
                 if (transaction.length() != 44) {
                     return "FAILURE: Improper format";
                 }
 
+                // Parse transaction info
                 std::string buyer_name = rtrim(transaction.substr(3, 15));
                 std::string seller_name = rtrim(transaction.substr(19, 15));
                 double refund_credit = std::stod(transaction.substr(35, 9));
 
                 std::vector<User> users = currentUserAccounts();
-
+                
+                // Find corresponding users
                 User* buyer = findUser(users, buyer_name);
                 User* seller = findUser(users, seller_name);
-
+                
+                // Confirm that users exist
                 if (buyer == nullptr || seller == nullptr ||
                     refund_credit <= 0) {
                     return "FAILURE: Transaction denied";
                 }
 
+                // Refund fails
                 if (!refund(*buyer, *seller, refund_credit)) {
                     return "FAILURE: Transaction denied";
                 }
 
+                // Rebuild current_user_file
                 currentUserAccountsConstructor(users);
                 return "SUCCESS: Transaction completed";
             }
 
             case 6: {
+                //Confirm format
                 if (transaction.length() != 31) {
                     return "FAILURE: Improper format";
                 }
 
+                // Parse transaction info
                 std::string username = rtrim(transaction.substr(3, 15));
                 double credit = std::stod(transaction.substr(22, 9));
 
+                // Check valid price
                 if (credit <= 0 || credit > 1000.00) {
                     return "FAILURE: Transaction denied";
                 }
 
+                // Get users and find corresponding user
                 std::vector<User> users = currentUserAccounts();
                 User* user = findUser(users, username);
 
+                // Check user's existence
                 if (user == nullptr) {
                     return "FAILURE: Transaction denied";
                 }
-
+  
+                // Add credit to user
                 user->addCredit(credit);
                 currentUserAccountsConstructor(users);
 

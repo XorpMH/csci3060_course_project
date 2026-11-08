@@ -51,6 +51,7 @@ bool sell(
     std::vector<Game>& pending_games
 );
 
+// Search for a game
 Game* searchGame(
     std::vector<Game>& games,
     const std::string& game_name
