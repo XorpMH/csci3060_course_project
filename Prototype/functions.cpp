@@ -199,6 +199,10 @@ void refund(){
 
 }
 
+//
+// FILE FUNCTIONS
+//
+
 // Build the file from a list of user accounts
 // UUUUUUUUUUUUUUU_TT_CCCCCCCCC
 void currentUserAccountsConstructor(std::vector<User>* users, std::string file_path){
