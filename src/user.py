@@ -37,5 +37,5 @@ class User:
         )
     def __str__(self):
         return(
-            f"username: {self,username}"
+            f"username: {self.username}"
         )
