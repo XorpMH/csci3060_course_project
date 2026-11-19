@@ -1,0 +1,6 @@
+login
+fullstduser1
+sell
+Hollow Quest
+10.00
+logout

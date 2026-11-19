@@ -1,10 +1,7 @@
 from src.user import User
 from src.game import Game
 
-
-# --------------------------------------------------
 # Helper functions
-# --------------------------------------------------
 
 def findUser(users, username):
     """
@@ -51,10 +48,8 @@ def validUserType(user_type):
 
     return user_type in valid_types
 
-
-# --------------------------------------------------
 # Transaction parsers
-# --------------------------------------------------
+
 
 def parseUserTransaction(line):
     """
@@ -212,9 +207,7 @@ def parseTransaction(line):
     return None
 
 
-# --------------------------------------------------
 # Account commands
-# --------------------------------------------------
 
 def createUser(current_user, users, username, user_type):
     """
@@ -337,10 +330,8 @@ def addCredit(current_user, users, username, amount):
 
     return True
 
-
-# --------------------------------------------------
 # Game commands
-# --------------------------------------------------
+
 
 def sellGame(current_user, games, game_name, price):
     """
@@ -485,9 +476,8 @@ def refundGame(users, buyer_name, seller_name, amount):
     return True
 
 
-# --------------------------------------------------
 # Transaction application
-# --------------------------------------------------
+
 
 def applyTransaction(
     transaction,

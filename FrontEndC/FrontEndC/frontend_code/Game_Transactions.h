@@ -1,0 +1,45 @@
+#pragma once
+#include <map>
+#include <string>
+#include <vector>
+#include "Game.h"
+#include "Session.h"
+#include "Transaction_Writer.h"
+
+// Handles buying and selling games and tracks the games currently for sale.
+class Game_Transactions {
+private:
+    // Shared writer, held by reference so every class logs to the same file.
+    Transaction_Writer& transaction;
+    Session& session;
+    std::map<std::string, std::vector<Game>> games_for_sale;
+    // Games listed during this session; they cannot be bought until tomorrow.
+    std::vector<Game> pending_sales;
+
+public:
+    // Initializes with the session, the shared writer and the games currently for sale.
+    Game_Transactions(Session& session, Transaction_Writer& transaction,
+                      const std::map<std::string, std::vector<Game>>& games_for_sale = {});
+
+    // Lets `user` buy a game: prompts for the game name and seller, then records it.
+    void buy(const std::string& user);
+
+    // Lets `user` put a game up for sale: prompts for the name and price.
+    void sell(const std::string& user);
+
+    // Prints every game currently for sale as "<name> <price>".
+    void list_games() const;
+
+    // Removes all games listed for sale by `user` (e.g. when the account is deleted).
+    void remove_seller_games(const std::string& user);
+
+    // Returns true if a game with this name is already for sale or was listed this session.
+    bool is_name_taken(const std::string& game) const;
+
+    // Prompts for a query and prints every game and user whose name contains it
+    // (case-insensitive). Non-admins do not see admins who are not selling a game.
+    void search();
+
+    // Returns true if `user` has at least one game currently for sale.
+    bool is_selling(const std::string& user) const;
+};

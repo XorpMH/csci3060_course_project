@@ -1,0 +1,7 @@
+frontend_code/frontend
+frontend_code/distribution-system
+frontend_code/daily_transactions.txt
+
+# test-run outputs: every run writes a new timestamped folder under actual/
+frontend_transaction_tests/actual/*
+!frontend_transaction_tests/actual/.gitkeep
