@@ -1,0 +1,3 @@
+Enter username:
+Login successful, welcome sellstduser1 (sell-standard).
+Game name: Seller: Error: seller has no games for sale.

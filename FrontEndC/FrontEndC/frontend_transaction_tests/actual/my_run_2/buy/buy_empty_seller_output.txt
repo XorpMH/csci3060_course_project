@@ -1,0 +1,4 @@
+Enter username:
+Login successful, welcome fullstduser1 (full-standard).
+Game name: Seller: Error: seller has no games for sale.
+Logout successful.

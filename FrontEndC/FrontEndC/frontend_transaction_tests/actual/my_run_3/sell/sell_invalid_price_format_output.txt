@@ -1,0 +1,4 @@
+Enter username:
+Login successful, welcome admuser1 (admin).
+Game name: Price: Error: invalid price.
+Logout successful.

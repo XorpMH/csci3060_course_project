@@ -1,0 +1,5 @@
+Enter username:
+Login successful, welcome fullstduser1 (full-standard).
+Game name: Error: game name is already taken.
+Error: unknown command.
+Logout successful.

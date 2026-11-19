@@ -1,0 +1,6 @@
+Enter username:
+Login successful, welcome admuser1 (admin).
+Game name: Price: Enter game name:
+Enter seller username:
+ERROR: Insufficient credit to complete purchase.
+Logout successful.

@@ -1,0 +1,3 @@
+06 buystduser1        000600.00
+06 buystduser1        000500.00
+00 buystduser1     BS 000000.00

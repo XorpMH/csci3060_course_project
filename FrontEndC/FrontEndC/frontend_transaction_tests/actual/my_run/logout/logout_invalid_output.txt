@@ -1,0 +1,2 @@
+Error: no user is logged in.
+Username: 

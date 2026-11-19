@@ -1,0 +1,1 @@
+Username: New username: Error: admin privileges required.

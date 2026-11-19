@@ -1,0 +1,2 @@
+Username: Game name: Error: game name is already taken.
+Error: unknown command.

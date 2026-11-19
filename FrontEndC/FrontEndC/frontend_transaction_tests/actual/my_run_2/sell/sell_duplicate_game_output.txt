@@ -1,0 +1,5 @@
+Enter username:
+Login successful, welcome admuser1 (admin).
+Game name: Error: game name is already taken.
+Error: unknown command.
+Logout successful.

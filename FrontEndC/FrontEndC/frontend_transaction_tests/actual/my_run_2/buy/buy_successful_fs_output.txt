@@ -1,0 +1,5 @@
+Enter username:
+Login successful, welcome fullstduser1 (full-standard).
+Enter amount to add:
+Added $20.00 credit to fullstduser1.
+Game name: Seller: Logout successful.

@@ -1,0 +1,4 @@
+Enter username:
+Login successful, welcome admuser1 (admin).
+Enter username:
+Error: a user is already logged in.

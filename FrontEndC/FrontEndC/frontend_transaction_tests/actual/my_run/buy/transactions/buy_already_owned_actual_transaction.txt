@@ -1,0 +1,4 @@
+06 fullstduser1       000040.00
+04 Stardew Valley      sellstduser1    fullstduser1    015.00
+04 Stardew Valley      sellstduser1    fullstduser1    015.00
+00 fullstduser1    FS 000000.00
