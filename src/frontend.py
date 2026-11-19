@@ -5,10 +5,7 @@ from src.file_handler import readFile, writeFile
 
 import sys
 
-
-# --------------------------------------------------
 # User file functions
-# --------------------------------------------------
 
 def loadUsers(file_path):
     """
@@ -76,10 +73,7 @@ def saveUsers(file_path, users):
         lines
     )
 
-
-# --------------------------------------------------
 # Game file functions
-# --------------------------------------------------
 
 def loadGames(file_path):
     """
@@ -147,10 +141,7 @@ def saveGames(file_path, games):
         lines
     )
 
-
-# --------------------------------------------------
 # Backend helpers
-# --------------------------------------------------
 
 def findAdministrativeUser(users):
     """
@@ -255,10 +246,7 @@ def runBackend(
 
     return True
 
-
-# --------------------------------------------------
 # Main program
-# --------------------------------------------------
 
 def main():
     """
