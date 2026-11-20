@@ -233,10 +233,12 @@ def encodeUser(user):
 
     Returns the formatted string.
     """
+    # Pad values
+    padded_username = str(user.get_username()).ljust(15)[:15]
+    padded_user_type = str(user.get_user_type()).ljust(2)[:2]
+    padded_credit = f"{user.get_credit():09.2f}"[:9] #:09 pads zeroes on the right and .2f gives 2 decimal places
 
-    # TODO
-
-    return ""
+    return padded_username + "_" + padded_user_type + "_" + padded_credit
 
 def encodeGame(game):
     """
@@ -559,7 +561,7 @@ def applyTransactions(
     if not transaction_lines:
         return 
 
-    # Get the current user from the logout transactions
+    # Get the current user from the logout transaction
     current_user = None # TODO
 
     # construct list of current users
