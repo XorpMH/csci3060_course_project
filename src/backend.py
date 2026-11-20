@@ -241,6 +241,8 @@ def encodeUser(user):
 def encodeGame(game):
     """
     Encode a Game object into string format for the available_games file.
+
+    Into IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS_PPPPPP
     
     Returns the formatted string.
     """
@@ -251,7 +253,9 @@ def encodeGame(game):
 
 def encodeCollectedGame(game, owner):
     """
-    Encode a game object into string format for the games_collection file.
+    Encode a Game object into string format for the games_collection file.
+
+    Into IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
         
     Returns the formatted string.
     """
