@@ -541,10 +541,10 @@ def refundGame(users, buyer_name, seller_name, amount):
 # Transaction application
 
 def applyTransactions(
-        daily_transactions_filepath, 
-        current_users_filepath,
-        available_games_filepath,
-        games_collection_filepath,
+        daily_transactions_filepath="daily_transactions.txt", 
+        current_users_filepath="current_users",
+        available_games_filepath="available_games.txt",
+        games_collection_filepath="games_collection.txt",
         log_filepath="log.txt"
 ):
     """
