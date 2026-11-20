@@ -1,3 +1,12 @@
+"""
+Backend handler for process the daily_transaction.txt file.
+
+Access with applyTransactions(), optionally adding custom file paths. 
+This program parses all the data files into lists of Games, Users, and game collections (matched user and game names)
+It then applies transactions to the parsed data, and re-encodes it back into those files.
+All transactions and their output (results) are recorded in the log file.
+"""
+
 from src.user import User
 from src.game import Game
 from src import file_handler
