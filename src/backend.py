@@ -592,9 +592,7 @@ def applyTransactions(
     current_user = None
     logout = parseTransaction(transaction_lines[-1])
     if logout is not None:
-        for user in users:
-            if logout.get("username") == user.get_username():
-                current_user = user
+        current_user = findUser(users, logout.get("username"))
     
     # Apply each transaction to the parsed data and log it
     for transaction in transaction_lines:
