@@ -257,16 +257,17 @@ def encodeGame(game):
 
 def encodeCollectedGame(game, owner):
     """
-    Encode a Game object into string format for the games_collection file.
+    Encode a game name and username into string format for the games_collection file.
 
     Into IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
         
     Returns the formatted string.
     """
+    # Pad values
+    padded_game_name = str(game.get_name()).ljust(19)[:19]
+    padded_owner_name = str(owner.get_username()).ljust(15)[:15]
 
-    # TODO: This is different from parseGame, because it needs to combine both the game and the owner into one line
-
-    return ""
+    return padded_game_name + "_" + padded_owner_name
 
 # User transactions
 
