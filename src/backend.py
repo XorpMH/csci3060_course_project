@@ -11,6 +11,7 @@ def findUser(users, username):
     Returns None if the user does not exist.
     """
 
+    # Check list of users for user
     for user in users:
         if user.get_username() == username:
             return user
@@ -26,6 +27,7 @@ def findGame(games, game_name):
     Returns None if the game does not exist.
     """
 
+    # Check list of games for game
     for game in games:
         if game.get_name() == game_name:
             return game
@@ -38,6 +40,7 @@ def validUserType(user_type):
     Checks whether a user type is valid.
     """
 
+    # Definition of every user type
     valid_types = [
         "AA",
         "FS",
@@ -46,10 +49,10 @@ def validUserType(user_type):
         "AM"
     ]
 
+    # Compare user type
     return user_type in valid_types
 
 # Transaction parser
-
 
 def parseTransaction(line):
     """
@@ -69,22 +72,27 @@ def parseTransaction(line):
     Returns None if the transaction is invalid.
     """
 
+    # Empty check
     if line is None or len(line) < 2:
         return None
 
+    # Parse transaction type
     code = line[0:2]
 
     try:
         match code:
+            # Logoout, Create, Delete, Add credit
             case "00" | "01" | "02" | "06":
-
+                # Length check
                 if len(line) < 31:
                     return None
 
+                # Parse line
                 username = line[3:18].rstrip()
                 user_type = line[19:21].rstrip()
                 credit = float(line[22:31])
 
+                # Return parsed values as a dictionary
                 return {
                     "code": code,
                     "username": username,
@@ -92,15 +100,18 @@ def parseTransaction(line):
                     "credit": credit
                 }
 
+            # Sell
             case "03":
-
+                # Length check
                 if len(line) < 52:
                     return None
 
+                # Parse line
                 game_name = line[3:29].rstrip()
                 seller = line[30:45].rstrip()
                 price = float(line[46:52])
 
+                # Return parsed values as a dictionary
                 return {
                     "code": code,
                     "game": game_name,
@@ -108,16 +119,19 @@ def parseTransaction(line):
                     "price": price
                 }
 
+            # Buy
             case "04":
-
+                # Length check
                 if len(line) < 68:
                     return None
 
+                # Parse line
                 game_name = line[3:29].rstrip()
                 seller = line[30:45].rstrip()
                 buyer = line[46:61].rstrip()
                 price = float(line[62:68])
 
+                # Return parsed values as a dictionary
                 return {
                     "code": code,
                     "game": game_name,
@@ -126,15 +140,18 @@ def parseTransaction(line):
                     "price": price
                 }
 
+            # Refund
             case "05":
-
+                # Length check
                 if len(line) < 44:
                     return None
-
+                
+                # Parse line
                 buyer = line[3:18].rstrip()
                 seller = line[19:34].rstrip()
                 credit = float(line[35:44])
 
+                # Return parsed values as a dictionary
                 return {
                     "code": code,
                     "buyer": buyer,
@@ -149,7 +166,7 @@ def parseTransaction(line):
     except ValueError:
         return None
 
-# Account commands
+# User transactions
 
 def createUser(current_user, users, username, user_type):
     """
@@ -161,24 +178,27 @@ def createUser(current_user, users, username, user_type):
     but cannot create AA accounts.
     """
 
+    # Current user must exist
     if current_user is None:
         return False
 
     current_type = current_user.get_user_type()
 
-    if current_type not in ["AA", "AM"]:
+    # Confirm user type
+    if not validUserType(user_type):
         return False
 
-    if not validUserType(user_type):
+    # Only admins and account managers can create a user
+    if current_type not in ["AA", "AM"]:
         return False
 
     # Account Managers cannot create admins
     if current_type == "AM" and user_type == "AA":
         return False
 
+    # Username validity
     if username == "":
         return False
-
     if len(username) > 15:
         return False
 
@@ -207,34 +227,28 @@ def deleteUser(current_user, users, username):
     but cannot delete AA accounts.
     """
 
+    # Current user must exist
     if current_user is None:
         return False
 
     current_type = current_user.get_user_type()
 
+    # Only admins and account managers can delete a user
     if current_type not in ["AA", "AM"]:
         return False
 
-    target_user = findUser(
-        users,
-        username
-    )
+    target_user = findUser(users,username)
 
+    # Deletion target must exist
     if target_user is None:
         return False
 
     # User cannot delete themselves
-    if (
-        target_user.get_username()
-        == current_user.get_username()
-    ):
+    if (target_user.get_username() == current_user.get_username()):
         return False
 
     # Account Manager cannot delete an admin
-    if (
-        current_type == "AM"
-        and target_user.get_user_type() == "AA"
-    ):
+    if (current_type == "AM" and target_user.get_user_type() == "AA"):
         return False
 
     users.remove(target_user)
@@ -250,23 +264,21 @@ def addCredit(current_user, users, username, amount):
     privileges for this transaction.
     """
 
+    # Current user must exist
     if current_user is None:
         return False
 
-    if current_user.get_user_type() not in [
-        "AA",
-        "AM"
-    ]:
+    # Only Account managers and admins can grant credit
+    if current_user.get_user_type() not in ["AA","AM"]:
         return False
 
+    # Cannot grant negative credit
     if amount <= 0:
         return False
 
-    target_user = findUser(
-        users,
-        username
-    )
+    target_user = findUser(users,username)
 
+    # Target must exist
     if target_user is None:
         return False
 
@@ -284,6 +296,7 @@ def sellGame(current_user, games, game_name, price):
     BS users cannot sell games.
     """
 
+    # Current user must exist
     if current_user is None:
         return False
 
@@ -297,6 +310,7 @@ def sellGame(current_user, games, game_name, price):
     if user_type == "BS":
         return False
 
+    # No game name
     if game_name == "":
         return False
 
@@ -304,9 +318,11 @@ def sellGame(current_user, games, game_name, price):
     if len(game_name) > 26:
         return False
 
+    # Price cannot be below zero
     if price < 0:
         return False
 
+    # Price cannot be equal or above 1000
     if price > 999.99:
         return False
 
@@ -314,6 +330,7 @@ def sellGame(current_user, games, game_name, price):
     if findGame(games, game_name) is not None:
         return False
 
+    # Add game if all checks pass
     games.append(
         Game(
             game_name,
@@ -333,6 +350,7 @@ def buyGame(current_user, users, games, game_name):
     SS users cannot buy games.
     """
 
+    # Current user must exist
     if current_user is None:
         return False
 
@@ -346,11 +364,9 @@ def buyGame(current_user, users, games, game_name):
     if user_type == "SS":
         return False
 
-    game = findGame(
-        games,
-        game_name
-    )
+    game = findGame(games,game_name)
 
+    # Game must exist
     if game is None:
         return False
 
@@ -367,11 +383,9 @@ def buyGame(current_user, users, games, game_name):
     if current_user.get_credit() < price:
         return False
 
-    seller = findUser(
-        users,
-        game.get_seller()
-    )
+    seller = findUser(users,game.get_seller())
 
+    # Seller must exist
     if seller is None:
         return False
 
@@ -393,31 +407,30 @@ def refundGame(users, buyer_name, seller_name, amount):
     Refunds money from the seller to the buyer.
     """
 
+    # Cannot refund negative credit
     if amount <= 0:
         return False
 
-    buyer = findUser(
-        users,
-        buyer_name
-    )
+    buyer = findUser(users,buyer_name)
+    seller = findUser(users,seller_name)
 
-    seller = findUser(
-        users,
-        seller_name
-    )
-
+    # Buyer must exist
     if buyer is None:
         return False
 
+    # Seller must exist
     if seller is None:
         return False
 
+    # Seller must have enough credit
     if seller.get_credit() < amount:
         return False
 
+    # Deduct credit from seller
     if not seller.deduct_credit(amount):
         return False
 
+    # Add credit to the buyer if credit deduction works
     buyer.add_credit(amount)
 
     return True
@@ -438,8 +451,10 @@ def applyTransaction(
     or cannot be completed.
     """
 
+    # Parse the transaction string into the required information
     data = parseTransaction(transaction)
 
+    # Invalid transactions are parsed as None
     if data is None:
         return False
 
