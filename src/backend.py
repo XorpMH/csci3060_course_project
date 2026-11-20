@@ -1,5 +1,6 @@
 from src.user import User
 from src.game import Game
+from src import file_handler
 
 # Helper functions
 
@@ -52,7 +53,7 @@ def validUserType(user_type):
     # Compare user type
     return user_type in valid_types
 
-# Transaction parser
+# String parsers
 
 def parseTransaction(line):
     """
@@ -165,6 +166,80 @@ def parseTransaction(line):
 
     except ValueError:
         return None
+
+def parseUser(line):
+    """
+    Parse a user string into a User object.
+
+    From UUUUUUUUUUUUUUU_TT_CCCCCCCCC
+
+    Returns the constructed user or None if invalid.
+    """
+    # Empty check
+    if line is None or len(line) < 15:
+        return None
+
+    # TODO
+
+    return None
+def parseGame(line):
+    """
+    Parse a game string into a Game object from the available_games file.
+
+    Returns the constructed game or None if invalid.
+    """
+
+    # TODO
+
+    return None
+
+def parseCollectedGame(line):
+    """
+    Parse a game string into a Game object from the games_collection file.
+
+    Returns the constructed game or None if invalid.
+    """
+
+    # TODO
+
+    return None
+
+# String encoders
+
+def encodeUser(user):
+    """
+    Encode a User object into string format for the current_users file.
+
+    Into UUUUUUUUUUUUUUU_TT_CCCCCCCCC
+
+    Returns the formatted string.
+    """
+
+    # TODO
+
+    return ""
+
+def encodeGame(game):
+    """
+    Encode a Game object into string format for the available_games file.
+    
+    Returns the formatted string.
+    """
+
+    # TODO
+
+    return ""
+
+def encodeCollectedGame(game):
+    """
+    Encode a game object into string format for the games_collection file.
+        
+    Returns the formatted string.
+    """
+
+    # TODO
+
+    return ""
 
 # User transactions
 
@@ -437,18 +512,99 @@ def refundGame(users, buyer_name, seller_name, amount):
 
 # Transaction application
 
-def applyTransactions():
+def applyTransactions(
+        daily_transactions_filepath, 
+        current_users_filepath,
+        available_games_filepath,
+        games_collection_filepath,
+        log_filepath="log.txt"
+):
     """
-    
+    Parses all data files, applies all transactions to data, and recompose data files.
+    Appends transactions to the log with their runtime information. (Success or failure, etc.) 
+
+    Call this method in the frontend after logout.
     """
 
-    return
+    # Read all data files into lists of strings
+    transaction_lines = file_handler.readFile(daily_transactions_filepath)
+    current_users_lines = file_handler.readFile(current_users_filepath)
+    available_games_lines = file_handler.readFile(available_games_filepath)
+    games_collection_lines = file_handler.readFile(games_collection_filepath)
+
+    # Requires at least 1 transaction
+    if not transaction_lines:
+        return 
+
+    # construct list of current users
+    users = []
+    for line in current_users_lines:
+        new_user = parseUser(line)
+        
+        if new_user is not None: 
+            users.append(new_user)
+
+    # construct list of available games
+    games = []
+    for line in available_games_lines:
+        new_game = parseGame(line)
+        
+        if new_game is not None: 
+            games.append(new_game)
+
+    # Get the current user from the logout transactions
+    current_user = None # TODO
+    if current_user is None:
+        return
+
+    # construct list of games in the current user's collection
+    games_collection = []
+    for line in games_collection_lines:
+        new_game = parseCollectedGame(line)
+        
+        if new_game is not None: 
+            games_collection.append(new_game)
+
+    # Apply each transaction to the parsed data and log it
+    for transaction in transaction_lines:
+        # Apply transaction
+        result = applyTransaction(transaction, current_user, users, games, games_collection)
+        
+        # Log result
+        file_handler.appendFile(log_filepath, str(transaction) + "\n" + str(result) + "\n")
+
+    # Encode updated users list back into a list of strings and write it to the file
+    encoded_users = []
+    for user in users:
+        new_line = encodeUser(user)
+
+        encoded_users.append(new_line)
+    file_handler.writeFile(current_users_filepath, encoded_users)
+
+    # Encode updated games list back into a list of strings and write it to the file
+    encoded_games = []
+    for game in games:
+        new_line = encodeGame(game)
+
+        encoded_games.append(new_line)
+    file_handler.writeFile(available_games_filepath, encoded_games)
+
+    # Encode updated games_collection list back a list of into strings and write it to the file
+    encoded_games_collection = []
+    for game in games_collection: 
+        new_line = encodeCollectedGame(game)
+        
+        encoded_games.append(new_line)
+    file_handler.writeFile(available_games_filepath, encoded_games)
+
+    # TODO: Delete daily_transactions file? Need to check if the frontend handles cleanup
 
 def applyTransaction(
-    transaction,
-    current_user,
-    users,
-    games
+    transaction, # Transaction to be applied
+    current_user, # User doing the transaction
+    users, # 
+    games,
+    games_collection
 ):
     """
     Applies one transaction produced by FrontEndC.
