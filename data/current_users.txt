@@ -1,0 +1,8 @@
+admuser1       _AA_000000.00
+fullstduser1   _FS_000000.00
+fullstd02      _FS_000000.00
+buystduser1    _BS_000000.00
+sellstduser1   _SS_000000.00
+admidle1       _AA_000000.00
+richbuyer1     _FS_999500.00
+richvendor1    _SS_999990.00
