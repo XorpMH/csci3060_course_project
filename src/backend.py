@@ -11,6 +11,10 @@ All transactions and their output (results) are recorded in the log file.
 from src.user import User
 from src.game import Game
 from src import file_handler
+from pathlib import Path
+
+# Default path (data folder outside src)
+DEFAULT_PATH = Path(__file__).resolve().parent.parent / "data"
 
 # Helper functions
 
@@ -200,18 +204,18 @@ def parseGame(line):
     """
     Parse a game string into a Game object from the available_games file.
     
-    From IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS_PPPPPP
+    From IIIIIIIIIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS_PPPPPP
 
     Returns the constructed game or None if invalid.
     """
     # Format check
-    if line is None or len(line) < 42:
+    if line is None or len(line) < 49:
         return None
 
     # Parse line
-    game_name = line[0:19].rstrip()
-    seller_name = line[20:35].rstrip()
-    price = float(line[36:42])
+    game_name = line[0:26].rstrip()
+    seller_name = line[27:42].rstrip()
+    price = float(line[43:49])
 
     return Game(game_name, seller_name, price)
 
@@ -219,17 +223,17 @@ def parseCollectedGame(line):
     """
     Parse a game string into a Game object from the games_collection file.
 
-    From IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
+    From IIIIIIIIIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
 
     Returns the game name and associated username or None if invalid.
     """
     # Format check
-    if line is None or len(line) < 35:
+    if line is None or len(line) < 42:
         return None, None
 
     # Parse line
-    game_name = line[0:19].rstrip()
-    owner_name = line[20:35].rstrip()
+    game_name = line[0:26].rstrip()
+    owner_name = line[27:42].rstrip()
 
     return game_name, owner_name
 
@@ -254,12 +258,12 @@ def encodeGame(game):
     """
     Encode a Game object into string format for the available_games file.
 
-    Into IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS_PPPPPP
+    Into IIIIIIIIIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS_PPPPPP
     
     Returns the formatted string.
     """
     # Pad values
-    padded_game_name = str(game.get_name()).ljust(19)[:19]
+    padded_game_name = str(game.get_name()).ljust(26)[:26]
     padded_seller_name = str(game.get_seller()).ljust(15)[:15]
     padded_price = f"{game.get_price():06.2f}"[:6] #:06 pads zeroes on the right and .2f locks to 2 decimal places
 
@@ -269,12 +273,12 @@ def encodeCollectedGame(game_name, owner_name):
     """
     Encode a game name and username into string format for the games_collection file.
 
-    Into IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
+    Into IIIIIIIIIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
         
     Returns the formatted string.
     """
     # Pad values
-    padded_game_name = str(game_name).ljust(19)[:19]
+    padded_game_name = str(game_name).ljust(26)[:26]
     padded_owner_name = str(owner_name).ljust(15)[:15]
 
     return padded_game_name + "_" + padded_owner_name
@@ -551,11 +555,11 @@ def refundGame(users, buyer_name, seller_name, amount):
 # Transaction application
 
 def applyTransactions(
-        daily_transactions_filepath="data/daily_transactions.txt", 
-        current_users_filepath="data/current_users.txt",
-        available_games_filepath="data/available_games.txt",
-        games_collection_filepath="data/games_collection.txt",
-        log_filepath="data/log.txt"
+        daily_transactions_filepath=str(DEFAULT_PATH / "data/daily_transactions.txt"), 
+        current_users_filepath=str(DEFAULT_PATH / "data/current_users.txt"),
+        available_games_filepath=str(DEFAULT_PATH / "data/available_games.txt"),
+        games_collection_filepath=str(DEFAULT_PATH / "data/games_collection.txt"),
+        log_filepath=str(DEFAULT_PATH / "data/log.txt")
 ):
     """
     Parses all data files, applies all transactions to data, and recompose data files.
