@@ -255,7 +255,7 @@ def encodeGame(game):
 
     return padded_game_name + "_" + padded_seller_name + "_" + padded_price
 
-def encodeCollectedGame(game, owner):
+def encodeCollectedGame(game_name, owner_name):
     """
     Encode a game name and username into string format for the games_collection file.
 
@@ -264,8 +264,8 @@ def encodeCollectedGame(game, owner):
     Returns the formatted string.
     """
     # Pad values
-    padded_game_name = str(game.get_name()).ljust(19)[:19]
-    padded_owner_name = str(owner.get_username()).ljust(15)[:15]
+    padded_game_name = str(game_name).ljust(19)[:19]
+    padded_owner_name = str(owner_name).ljust(15)[:15]
 
     return padded_game_name + "_" + padded_owner_name
 
@@ -591,9 +591,10 @@ def applyTransactions(
     # Get the current user from the logout transaction
     current_user = None
     logout = parseTransaction(transaction_lines[-1])
-    for user in users:
-        if logout.get("username") == user.get_username():
-            current_user = user
+    if logout is not None:
+        for user in users:
+            if logout.get("username") == user.get_username():
+                current_user = user
     
     # Apply each transaction to the parsed data and log it
     for transaction in transaction_lines:
