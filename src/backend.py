@@ -612,11 +612,11 @@ def applyTransactions(
 
     # Encode updated games_collection list back a list of into strings and write it to the file
     encoded_games_collection = []
-    for game in games_collection: 
-        new_line = encodeCollectedGame(game)
+    for game_name, user_name in games_collection: 
+        new_line = encodeCollectedGame(game_name, user_name)
         
-        encoded_games.append(new_line)
-    file_handler.writeFile(games_collection_filepath, encoded_games)
+        encoded_games_collection.append(new_line)
+    file_handler.writeFile(games_collection_filepath, encoded_games_collection)
 
     # TODO: Delete daily_transactions file? Need to check if the frontend handles cleanup
 
