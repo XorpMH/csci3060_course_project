@@ -1,3 +1,7 @@
+"""
+Helper functions for cleanly handling files, converting lists of lines to and from file data.
+"""
+
 def readFile(file_path):
     """
     Reads an entire file line by line and returns a list of lines.
