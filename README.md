@@ -8,5 +8,7 @@ Call applyTransactions() with changeable values
     games_collection_filepath,
     log_filepath
 
+To run a baseline test, write python -m src.main in a terminal.
+
 ## How to Run Test Suite
 Test suite for the backend has not yet been implemented.
