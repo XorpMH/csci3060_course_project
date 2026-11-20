@@ -200,7 +200,7 @@ def parseCollectedGame(line):
     Returns the constructed game or None if invalid.
     """
 
-    # TODO
+    # TODO: This is different from parseGame, because it needs to return both the game and the user who owns it.
 
     return None
 
@@ -230,14 +230,14 @@ def encodeGame(game):
 
     return ""
 
-def encodeCollectedGame(game):
+def encodeCollectedGame(game, owner):
     """
     Encode a game object into string format for the games_collection file.
         
     Returns the formatted string.
     """
 
-    # TODO
+    # TODO: This is different from parseGame, because it needs to combine both the game and the owner into one line
 
     return ""
 
