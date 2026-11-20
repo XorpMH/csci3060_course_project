@@ -175,13 +175,17 @@ def parseUser(line):
 
     Returns the constructed user or None if invalid.
     """
-    # Empty check
-    if line is None or len(line) < 15:
+    # Format check
+    if line is None or len(line) < 28:
         return None
 
-    # TODO
+    # Parse line
+    username = line[0:15].rstrip()
+    user_type = line[16:18].rstrip()
+    credit = float(line[19:28])
 
-    return None
+    return User(username, user_type, credit)
+
 def parseGame(line):
     """
     Parse a game string into a Game object from the available_games file.
@@ -554,8 +558,6 @@ def applyTransactions(
 
     # Get the current user from the logout transactions
     current_user = None # TODO
-    if current_user is None:
-        return
 
     # construct list of games in the current user's collection
     games_collection = []
@@ -595,7 +597,7 @@ def applyTransactions(
         new_line = encodeCollectedGame(game)
         
         encoded_games.append(new_line)
-    file_handler.writeFile(available_games_filepath, encoded_games)
+    file_handler.writeFile(games_collection_filepath, encoded_games)
 
     # TODO: Delete daily_transactions file? Need to check if the frontend handles cleanup
 
