@@ -551,11 +551,11 @@ def refundGame(users, buyer_name, seller_name, amount):
 # Transaction application
 
 def applyTransactions(
-        daily_transactions_filepath="daily_transactions.txt", 
-        current_users_filepath="current_users.txt",
-        available_games_filepath="available_games.txt",
-        games_collection_filepath="games_collection.txt",
-        log_filepath="log.txt"
+        daily_transactions_filepath="data/daily_transactions.txt", 
+        current_users_filepath="data/current_users.txt",
+        available_games_filepath="data/available_games.txt",
+        games_collection_filepath="data/games_collection.txt",
+        log_filepath="data/log.txt"
 ):
     """
     Parses all data files, applies all transactions to data, and recompose data files.
