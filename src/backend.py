@@ -564,9 +564,6 @@ def applyTransactions(
     if not transaction_lines:
         return 
 
-    # Get the current user from the logout transaction
-    current_user = None # TODO
-
     # construct list of current users
     users = []
     for line in current_users_lines:
@@ -590,6 +587,13 @@ def applyTransactions(
         
         if game_name is not None and user_name is not None: 
             games_collection.append((game_name, user_name))
+
+    # Get the current user from the logout transaction
+    current_user = None
+    logout = parseTransaction("") #TODO: Get the last line of the daily_transactions file
+    for user in users:
+        if logout.get("username") == user.get_username():
+            current_user = user
     
     # Apply each transaction to the parsed data and log it
     for transaction in transaction_lines:
