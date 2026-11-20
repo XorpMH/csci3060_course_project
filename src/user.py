@@ -9,18 +9,37 @@ class User:
         self.credit = credit
 
     def get_username(self):
+        """
+        Access username by value.
+        """
         return self.username
     def get_user_type(self):
+        """
+        Access user type by value.
+        """
         return self.user_type
     def get_credit(self):
+        """
+        Access user credit by value.
+        """
         return self.credit
+
     def add_credit(self, amount):
+        """
+        Add credit to the user equal to amount (positive numbers and 0 only)
+
+        Returns boolean of success state.
+        """
         if amount < 0:
             return False
         self.credit += amount
         return True
-
     def deduct_credit(self, amount):
+        """
+        Deduct credit from the user equal to amount (positive numbers and 0 only)
+
+        Returns boolean of success state.
+        """
         if amount < 0:
             return False
         if self.credit < amount:
