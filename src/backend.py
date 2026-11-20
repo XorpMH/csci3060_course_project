@@ -575,9 +575,6 @@ def applyTransactions(
         if new_game is not None: 
             games.append(new_game)
 
-    # Get the current user from the logout transactions
-    current_user = None # TODO
-
     # construct list of games in the current user's collection
     games_collection = []
     for line in games_collection_lines:
@@ -586,6 +583,9 @@ def applyTransactions(
         if game_name is not None and user_name is not None: 
             games_collection.append((game_name, user_name))
 
+    # Get the current user from the logout transactions
+    current_user = None # TODO
+    
     # Apply each transaction to the parsed data and log it
     for transaction in transaction_lines:
         # Apply transaction
