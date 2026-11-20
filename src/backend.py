@@ -209,10 +209,12 @@ def parseCollectedGame(line):
     """
     Parse a game string into a Game object from the games_collection file.
 
-    Returns the constructed game or None if invalid.
+    Returns the game name and associated username or None if invalid.
     """
 
     # TODO: This is different from parseGame, because it needs to return both the game and the user who owns it.
+
+    
 
     return None
 
