@@ -209,14 +209,19 @@ def parseCollectedGame(line):
     """
     Parse a game string into a Game object from the games_collection file.
 
+    From IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS
+
     Returns the game name and associated username or None if invalid.
     """
+    # Format check
+    if line is None or len(line) < 35:
+        return None, None
 
-    # TODO: This is different from parseGame, because it needs to return both the game and the user who owns it.
+    # Parse line
+    game_name = line[0:19].rstrip()
+    owner_name = line[20:35].rstrip()
 
-    
-
-    return None
+    return game_name, owner_name
 
 # String encoders
 
@@ -572,10 +577,10 @@ def applyTransactions(
     # construct list of games in the current user's collection
     games_collection = []
     for line in games_collection_lines:
-        new_game = parseCollectedGame(line)
+        game_name, user_name = parseCollectedGame(line)
         
-        if new_game is not None: 
-            games_collection.append(new_game)
+        if game_name is not None and user_name is not None: 
+            games_collection.append((game_name, user_name))
 
     # Apply each transaction to the parsed data and log it
     for transaction in transaction_lines:
