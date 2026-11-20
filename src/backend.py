@@ -3,7 +3,7 @@ from src.game import Game
 
 # Helper functions
 
-def findUser(users, username):
+def __findUser(self, users, username):
     """
     Finds a user by username.
 
@@ -19,7 +19,7 @@ def findUser(users, username):
     return None
 
 
-def findGame(games, game_name):
+def __findGame(self, games, game_name):
     """
     Finds a game by game name.
 
@@ -35,7 +35,7 @@ def findGame(games, game_name):
     return None
 
 
-def validUserType(user_type):
+def __validUserType(self, user_type):
     """
     Checks whether a user type is valid.
     """
@@ -54,7 +54,7 @@ def validUserType(user_type):
 
 # Transaction parser
 
-def parseTransaction(line):
+def __parseTransaction(self, line):
     """
     Parses one fixed-width transaction line produced by FrontEndC.
 
@@ -168,7 +168,7 @@ def parseTransaction(line):
 
 # User transactions
 
-def createUser(current_user, users, username, user_type):
+def __createUser(self, current_user, users, username, user_type):
     """
     Creates a new user account.
 
@@ -185,7 +185,7 @@ def createUser(current_user, users, username, user_type):
     current_type = current_user.get_user_type()
 
     # Confirm user type
-    if not validUserType(user_type):
+    if not self.validUserType(user_type):
         return False
 
     # Only admins and account managers can create a user
@@ -203,7 +203,7 @@ def createUser(current_user, users, username, user_type):
         return False
 
     # Username must be unique
-    if findUser(users, username) is not None:
+    if self.findUser(users, username) is not None:
         return False
 
     users.append(
@@ -217,7 +217,7 @@ def createUser(current_user, users, username, user_type):
     return True
 
 
-def deleteUser(current_user, users, username):
+def __deleteUser(self, current_user, users, username):
     """
     Deletes an existing user account.
 
@@ -237,7 +237,7 @@ def deleteUser(current_user, users, username):
     if current_type not in ["AA", "AM"]:
         return False
 
-    target_user = findUser(users,username)
+    target_user = self.findUser(users,username)
 
     # Deletion target must exist
     if target_user is None:
@@ -256,7 +256,7 @@ def deleteUser(current_user, users, username):
     return True
 
 
-def addCredit(current_user, users, username, amount):
+def __addCredit(self, current_user, users, username, amount):
     """
     Adds credit to an existing user account.
 
@@ -276,7 +276,7 @@ def addCredit(current_user, users, username, amount):
     if amount <= 0:
         return False
 
-    target_user = findUser(users,username)
+    target_user = self.findUser(users,username)
 
     # Target must exist
     if target_user is None:
@@ -288,7 +288,7 @@ def addCredit(current_user, users, username, amount):
 
 # Game commands
 
-def sellGame(current_user, games, game_name, price):
+def __sellGame(self, current_user, games, game_name, price):
     """
     Places a game up for sale.
 
@@ -327,7 +327,7 @@ def sellGame(current_user, games, game_name, price):
         return False
 
     # Game name must be unique
-    if findGame(games, game_name) is not None:
+    if self.findGame(games, game_name) is not None:
         return False
 
     # Add game if all checks pass
@@ -342,7 +342,7 @@ def sellGame(current_user, games, game_name, price):
     return True
 
 
-def buyGame(current_user, users, games, game_name):
+def __buyGame(self, current_user, users, games, game_name):
     """
     Purchases an available game.
 
@@ -364,7 +364,7 @@ def buyGame(current_user, users, games, game_name):
     if user_type == "SS":
         return False
 
-    game = findGame(games,game_name)
+    game = self.findGame(games,game_name)
 
     # Game must exist
     if game is None:
@@ -383,7 +383,7 @@ def buyGame(current_user, users, games, game_name):
     if current_user.get_credit() < price:
         return False
 
-    seller = findUser(users,game.get_seller())
+    seller = self.findUser(users,game.get_seller())
 
     # Seller must exist
     if seller is None:
@@ -402,7 +402,7 @@ def buyGame(current_user, users, games, game_name):
     return True
 
 
-def refundGame(users, buyer_name, seller_name, amount):
+def __refundGame(self, users, buyer_name, seller_name, amount):
     """
     Refunds money from the seller to the buyer.
     """
@@ -411,8 +411,8 @@ def refundGame(users, buyer_name, seller_name, amount):
     if amount <= 0:
         return False
 
-    buyer = findUser(users,buyer_name)
-    seller = findUser(users,seller_name)
+    buyer = self.findUser(users,buyer_name)
+    seller = self.findUser(users,seller_name)
 
     # Buyer must exist
     if buyer is None:
@@ -437,7 +437,15 @@ def refundGame(users, buyer_name, seller_name, amount):
 
 # Transaction application
 
-def applyTransaction(
+def applyTransactions(self):
+    """
+    
+    """
+
+    return
+
+def __applyTransaction(
+    self,
     transaction,
     current_user,
     users,
@@ -452,7 +460,7 @@ def applyTransaction(
     """
 
     # Parse the transaction string into the required information
-    data = parseTransaction(transaction)
+    data = self.parseTransaction(transaction)
 
     # Invalid transactions are parsed as None
     if data is None:
@@ -468,7 +476,7 @@ def applyTransaction(
 
         # Create user
         case "01":
-            return createUser(
+            return self.createUser(
                 current_user,
                 users,
                 data["username"],
@@ -477,7 +485,7 @@ def applyTransaction(
 
         # Delete user
         case "02":
-            return deleteUser(
+            return self.deleteUser(
                 current_user,
                 users,
                 data["username"]
@@ -485,12 +493,12 @@ def applyTransaction(
 
         # Sell game
         case "03":
-            seller = findUser(
+            seller = self.findUser(
                 users,
                 data["seller"]
             )
 
-            return sellGame(
+            return self.sellGame(
                 seller,
                 games,
                 data["game"],
@@ -499,12 +507,12 @@ def applyTransaction(
 
         # Buy game
         case "04":
-            buyer = findUser(
+            buyer = self.findUser(
                 users,
                 data["buyer"]
             )
 
-            return buyGame(
+            return self.buyGame(
                 buyer,
                 users,
                 games,
@@ -513,7 +521,7 @@ def applyTransaction(
 
         # Refund
         case "05":
-            return refundGame(
+            return self.refundGame(
                 users,
                 data["buyer"],
                 data["seller"],
@@ -522,7 +530,7 @@ def applyTransaction(
 
         # Add credit
         case "06":
-            return addCredit(
+            return self.addCredit(
                 current_user,
                 users,
                 data["username"],
