@@ -189,13 +189,21 @@ def parseUser(line):
 def parseGame(line):
     """
     Parse a game string into a Game object from the available_games file.
+    
+    From IIIIIIIIIIIIIIIIIII_SSSSSSSSSSSSSSS_PPPPPP
 
     Returns the constructed game or None if invalid.
     """
+    # Format check
+    if line is None or len(line) < 42:
+        return None
 
-    # TODO
+    # Parse line
+    game_name = line[0:19].rstrip()
+    seller_name = line[20:35].rstrip()
+    price = float(line[36:42])
 
-    return None
+    return Game(game_name, seller_name, price)
 
 def parseCollectedGame(line):
     """
@@ -527,7 +535,7 @@ def applyTransactions(
     Parses all data files, applies all transactions to data, and recompose data files.
     Appends transactions to the log with their runtime information. (Success or failure, etc.) 
 
-    Call this method in the frontend after logout.
+    Call this method in the frontend after logout, or on its own afterwards.
     """
 
     # Read all data files into lists of strings
