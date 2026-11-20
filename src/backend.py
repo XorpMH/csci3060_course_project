@@ -236,7 +236,7 @@ def encodeUser(user):
     # Pad values
     padded_username = str(user.get_username()).ljust(15)[:15]
     padded_user_type = str(user.get_user_type()).ljust(2)[:2]
-    padded_credit = f"{user.get_credit():09.2f}"[:9] #:09 pads zeroes on the right and .2f gives 2 decimal places
+    padded_credit = f"{user.get_credit():09.2f}"[:9] #:09 pads zeroes on the right and .2f locks to 2 decimal places
 
     return padded_username + "_" + padded_user_type + "_" + padded_credit
 
@@ -248,10 +248,12 @@ def encodeGame(game):
     
     Returns the formatted string.
     """
+    # Pad values
+    padded_game_name = str(game.get_name()).ljust(19)[:19]
+    padded_seller_name = str(game.get_seller()).ljust(15)[:15]
+    padded_price = f"{game.get_price():06.2f}"[:6] #:06 pads zeroes on the right and .2f locks to 2 decimal places
 
-    # TODO
-
-    return ""
+    return padded_game_name + "_" + padded_seller_name + "_" + padded_price
 
 def encodeCollectedGame(game, owner):
     """
