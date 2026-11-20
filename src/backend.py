@@ -564,7 +564,7 @@ def applyTransactions(
     if not transaction_lines:
         return 
 
-    # construct list of current users
+    # Construct list of current users
     users = []
     for line in current_users_lines:
         new_user = parseUser(line)
@@ -572,7 +572,7 @@ def applyTransactions(
         if new_user is not None: 
             users.append(new_user)
 
-    # construct list of available games
+    # Construct list of available games
     games = []
     for line in available_games_lines:
         new_game = parseGame(line)
@@ -580,7 +580,7 @@ def applyTransactions(
         if new_game is not None: 
             games.append(new_game)
 
-    # construct list of games in the current user's collection
+    # Construct list of games in the current user's collection
     games_collection = []
     for line in games_collection_lines:
         game_name, user_name = parseCollectedGame(line)
