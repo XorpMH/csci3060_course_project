@@ -555,11 +555,11 @@ def refundGame(users, buyer_name, seller_name, amount):
 # Transaction application
 
 def applyTransactions(
-        daily_transactions_filepath=str(DEFAULT_PATH / "data/daily_transactions.txt"), 
-        current_users_filepath=str(DEFAULT_PATH / "data/current_users.txt"),
-        available_games_filepath=str(DEFAULT_PATH / "data/available_games.txt"),
-        games_collection_filepath=str(DEFAULT_PATH / "data/games_collection.txt"),
-        log_filepath=str(DEFAULT_PATH / "data/log.txt")
+        daily_transactions_filepath=str(DEFAULT_PATH / "daily_transactions.txt"), 
+        current_users_filepath=str(DEFAULT_PATH / "current_users.txt"),
+        available_games_filepath=str(DEFAULT_PATH / "available_games.txt"),
+        games_collection_filepath=str(DEFAULT_PATH / "games_collection.txt"),
+        log_filepath=str(DEFAULT_PATH / "log.txt")
 ):
     """
     Parses all data files, applies all transactions to data, and recompose data files.
