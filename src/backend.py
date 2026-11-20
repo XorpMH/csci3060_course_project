@@ -590,7 +590,7 @@ def applyTransactions(
 
     # Get the current user from the logout transaction
     current_user = None
-    logout = parseTransaction("") #TODO: Get the last line of the daily_transactions file
+    logout = parseTransaction(transaction_lines[-1])
     for user in users:
         if logout.get("username") == user.get_username():
             current_user = user
