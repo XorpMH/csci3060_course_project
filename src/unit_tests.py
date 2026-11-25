@@ -1,18 +1,50 @@
 from src.user import User
-from src.backend import addCredit, sellGame  
+from src.backend import createUser, deleteUser, addCredit, sellGame, findUser
 from src import file_handler
 
-def runTests():
-    """
-    TODO: ADD DESCRIPTION
-    TODO: run all test functions and output results
-    """
+# pip install -U pytest
+# python -m pytest src/unit_tests.py
 
-def testCreateUser():
+def testCreateUser_NotLoggedIn():
     """
-    TODO: ADD DESCRIPTION
-    TODO: Write tests
+    Test that if user is not logged in, the transaction rejects
     """
+    users = []
+    
+    result = createUser(None, users, "newuser", "FS")
+
+    assert result is False
+
+def testCreateUser_AdminOrAccountManagerReq():
+    """
+    Test that only AA and AM account types can create a user
+    AA: Admin
+    AM: Account Manager
+    """
+    # Admin
+    current_user = User("adminuser", "AA", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "FS")
+
+    assert result is True
+    assert findUser(users, "newuser") is not None
+
+    # Account Manager
+    current_user = User("accountmanager", "AM", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "FS")
+
+    assert result is True
+    assert findUser(users, "newuser") is not None
+
+    # Full Standard TODO
+
+    # Buy Standard TODO
+
+    # Sell Standard TODO
+    
 
 def testDeleteUser():
     """
