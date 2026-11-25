@@ -1,6 +1,5 @@
-from src.user import User
-from src.game import Game
-from src import backend
+from src.backend import addCredit, sellGame  
+from src import file_handler
 
 def runTests():
     """
@@ -21,10 +20,13 @@ def testDeleteUser():
     """
 
 def testAddCredit():
-    """
-    TODO: ADD DESCRIPTION
-    TODO: Write tests
-    """
+    """Test that adding credit requires a logged-in user"""
+    
+    users = []
+    
+    result = addCredit(None, users, "existinguser", 50)
+
+    assert result is False
 
 def testSellGame():
     """
@@ -43,4 +45,3 @@ def testRefundGame():
     TODO: ADD DESCRIPTION
     TODO: Write tests
     """
-    
