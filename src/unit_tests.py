@@ -1,4 +1,6 @@
-from src import file_handler
+from src.user import User
+from src.game import Game
+from src import backend
 
 def runTests():
     """
@@ -41,3 +43,4 @@ def testRefundGame():
     TODO: ADD DESCRIPTION
     TODO: Write tests
     """
+    
