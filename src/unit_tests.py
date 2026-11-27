@@ -14,6 +14,7 @@ def testCreateUser_NotLoggedIn():
     result = createUser(None, users, "newuser", "FS")
 
     assert result is False
+    assert findUser(users, "newuser") is None
 
 def testCreateUser_AdminOrAccountManagerReq():
     """
@@ -39,18 +40,97 @@ def testCreateUser_AdminOrAccountManagerReq():
     assert result is True
     assert findUser(users, "newuser") is not None
 
-    # Full Standard TODO
-
-    # Buy Standard TODO
-
-    # Sell Standard TODO
+    # Full Standard
+    current_user = User("normaluser", "FS", 0.00)
+    users = [current_user]
     
+    result = createUser(current_user, users, "newuser", "FS")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+    # Buy Standard
+    current_user = User("buyuser", "BS", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "FS")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+    # Sell Standard
+    current_user = User("buyuser", "SS", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "FS")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+def testCreateUser_InvalidType():
+    """
+    Test that user cannot be created with a type that doesn't exist in the system
+    """
+    current_user = User("accountmanager", "AM", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+def testCreateUser_AMCannotCreateAA():
+    """
+    Test that an account manager cannot create an admin user (privilege escalation)
+    """
+    current_user = User("accountmanager", "AM", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "AA")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+def testCreateUser_UsernameLength():
+    """
+    Test that the username must be between 1 and 15 characters
+    """
+    # Username over 15 characters
+    current_user = User("accountmanager", "AM", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "1234567890123456", "FS")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+    # Username empty
+    current_user = User("accountmanager", "AM", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "", "FS")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+def testCreateUser_Unique():
+    """
+    Test that the username of the created user cannot be one that already exists
+    """
+    current_user = User("accountmanager", "AM", 0.00)
+    existing_user = User("existinguser", "FS", 0.00)
+    users = [current_user, existing_user]
+    
+    result = createUser(current_user, users, "existinguser", "FS")
+
+    assert result is False
 
 def testDeleteUser():
     """
     TODO: ADD DESCRIPTION
     TODO: Write tests
     """
+    
 
 def testAddCredit():
     # Test that adding credit requires a logged-in user
