@@ -125,11 +125,17 @@ def testCreateUser_Unique():
 
     assert result is False
 
-def testDeleteUser():
+def testDeleteUser_NotLoggedIn():
     """
-    TODO: ADD DESCRIPTION
-    TODO: Write tests
+    Test that you cannot delete a user if the current user is not logged in
     """
+    existing_user = User("existinguser", "FS", 0.00)
+    users = [existing_user]
+        
+    result = deleteUser(None, users, "existinguser")
+
+    assert result is False
+    assert findUser(users, "existinguser") is not None
     
 
 def testAddCreditLoggedIn():
