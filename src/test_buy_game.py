@@ -1,243 +1,219 @@
+import pytest
+
 from src.backend import buyGame
 from src.user import User
 from src.game import Game
-from src.shared_tests import create_test_users, create_test_game
 
 
-def test_buy_game_success():
-    """
-    A valid buyer should be able to purchase an available game.
-    """
+@pytest.fixture
+def buy_data():
+    """Creates fresh user, game and collection data for each test."""
 
-    buyer, seller, _, _, _ = create_test_users()
+    buyer = User("buyeruser", "FS", 100.00)
+    seller = User("selleruser", "FS", 50.00)
 
-    users = [
-        buyer,
-        seller
-    ]
+    users = [buyer, seller]
 
-    game = create_test_game()
+    game = Game("Minecraft", "selleruser", 25.00)
 
-    games = [
-        game
-    ]
+    games = [game]
+    games_collection = []
+
+    return buyer, seller, users, games, games_collection
+
+
+def test_buy_game_success(buy_data):
+    """Tests a successful game purchase."""
+
+    buyer, seller, users, games, games_collection = buy_data
 
     result = buyGame(
-        buyer,
-        users,
-        games,
-        "Minecraft"
+        buyer, users, games, "Minecraft", games_collection
     )
 
     assert result is True
-
-    # Buyer starts with 100 and pays 25
     assert buyer.get_credit() == 75.00
-
-    # Seller starts with 50 and receives 25
     assert seller.get_credit() == 75.00
 
-    # Purchased game should no longer be available
-    assert game not in games
+    assert ("Minecraft", "buyeruser") in games_collection
+
+    assert len(games) == 1
+    assert games[0].get_name() == "Minecraft"
 
 
-def test_buy_game_not_enough_credit():
-    """
-    A user cannot purchase a game if they do not have enough credit.
-    """
+def test_buy_game_not_enough_credit(buy_data):
+    """Tests a buyer with insufficient credit."""
 
-    buyer = User(
-        "buyeruser",
-        "FS",
-        10.00
-    )
+    buyer, seller, users, games, games_collection = buy_data
 
-    seller = User(
-        "selleruser",
-        "FS",
-        50.00
-    )
-
-    users = [
-        buyer,
-        seller
-    ]
-
-    game = Game(
-        "Minecraft",
-        "selleruser",
-        25.00
-    )
-
-    games = [
-        game
-    ]
+    buyer.deduct_credit(90.00)
 
     result = buyGame(
-        buyer,
-        users,
-        games,
-        "Minecraft"
+        buyer, users, games, "Minecraft", games_collection
     )
 
     assert result is False
     assert buyer.get_credit() == 10.00
     assert seller.get_credit() == 50.00
-    assert game in games
+    assert games_collection == []
+    assert len(games) == 1
 
 
-def test_buy_game_missing_game():
-    """
-    A user cannot buy a game that does not exist.
-    """
+def test_buy_game_missing_game(buy_data):
+    """Tests purchasing a game that does not exist."""
 
-    buyer, seller, _, _, _ = create_test_users()
-
-    users = [
-        buyer,
-        seller
-    ]
-
-    games = []
+    buyer, seller, users, games, games_collection = buy_data
 
     result = buyGame(
-        buyer,
-        users,
-        games,
-        "Minecraft"
-    )
-
-    assert result is False
-
-
-def test_buy_game_own_game():
-    """
-    A seller cannot purchase their own game.
-    """
-
-    seller = User(
-        "selleruser",
-        "FS",
-        100.00
-    )
-
-    users = [
-        seller
-    ]
-
-    game = Game(
-        "Minecraft",
-        "selleruser",
-        25.00
-    )
-
-    games = [
-        game
-    ]
-
-    result = buyGame(
-        seller,
-        users,
-        games,
-        "Minecraft"
-    )
-
-    assert result is False
-    assert game in games
-
-
-def test_buy_game_account_manager():
-    """
-    AM users are not allowed to buy games.
-    """
-
-    _, seller, _, account_manager, _ = create_test_users()
-
-    users = [
-        account_manager,
-        seller
-    ]
-
-    game = create_test_game()
-
-    games = [
-        game
-    ]
-
-    result = buyGame(
-        account_manager,
-        users,
-        games,
-        "Minecraft"
-    )
-
-    assert result is False
-    assert game in games
-
-
-def test_buy_game_sell_standard():
-    """
-    SS users are not allowed to buy games.
-    """
-
-    _, seller, _, _, sell_standard = create_test_users()
-
-    users = [
-        sell_standard,
-        seller
-    ]
-
-    game = create_test_game()
-
-    games = [
-        game
-    ]
-
-    result = buyGame(
-        sell_standard,
-        users,
-        games,
-        "Minecraft"
-    )
-
-    assert result is False
-    assert game in games
-
-
-def test_buy_game_missing_seller():
-    """
-    A game cannot be purchased if its seller account does not exist.
-    """
-
-    buyer = User(
-        "buyeruser",
-        "FS",
-        100.00
-    )
-
-    users = [
-        buyer
-    ]
-
-    game = Game(
-        "Minecraft",
-        "missinguser",
-        25.00
-    )
-
-    games = [
-        game
-    ]
-
-    result = buyGame(
-        buyer,
-        users,
-        games,
-        "Minecraft"
+        buyer, users, games, "UnknownGame", games_collection
     )
 
     assert result is False
     assert buyer.get_credit() == 100.00
-    assert game in games
+    assert seller.get_credit() == 50.00
+    assert games_collection == []
 
-  
+
+def test_buy_game_own_game(buy_data):
+    """Tests a seller attempting to purchase their own game."""
+
+    buyer, seller, users, games, games_collection = buy_data
+
+    result = buyGame(
+        seller, users, games, "Minecraft", games_collection
+    )
+
+    assert result is False
+    assert seller.get_credit() == 50.00
+    assert games_collection == []
+    assert len(games) == 1
+
+
+@pytest.mark.parametrize("user_type", ["AM", "SS"])
+def test_buy_game_invalid_user_type(buy_data, user_type):
+    """Tests account types that cannot purchase games."""
+
+    buyer, seller, users, games, games_collection = buy_data
+
+    restricted_user = User("restricteduser", user_type, 100.00)
+
+    users.append(restricted_user)
+
+    result = buyGame(
+        restricted_user,
+        users,
+        games,
+        "Minecraft",
+        games_collection
+    )
+
+    assert result is False
+    assert restricted_user.get_credit() == 100.00
+    assert seller.get_credit() == 50.00
+    assert games_collection == []
+    assert len(games) == 1
+
+
+def test_buy_game_missing_seller(buy_data):
+    """Tests purchasing a game whose seller does not exist."""
+
+    buyer, seller, users, games, games_collection = buy_data
+
+    users.remove(seller)
+
+    result = buyGame(
+        buyer, users, games, "Minecraft", games_collection
+    )
+
+    assert result is False
+    assert buyer.get_credit() == 100.00
+    assert games_collection == []
+    assert len(games) == 1
+
+
+def test_buy_game_already_owned(buy_data):
+    """Tests purchasing a game that the buyer already owns."""
+
+    buyer, seller, users, games, games_collection = buy_data
+
+    games_collection.append(("Minecraft", "buyeruser"))
+
+    result = buyGame(
+        buyer, users, games, "Minecraft", games_collection
+    )
+
+    assert result is False
+    assert buyer.get_credit() == 100.00
+    assert seller.get_credit() == 50.00
+
+    assert games_collection == [
+        ("Minecraft", "buyeruser")
+    ]
+
+
+def test_buy_game_multiple_buyers(buy_data):
+    """Tests multiple users purchasing the same available game."""
+
+    buyer, seller, users, games, games_collection = buy_data
+
+    second_buyer = User("secondbuyer", "FS", 100.00)
+
+    users.append(second_buyer)
+
+    first_result = buyGame(
+        buyer, users, games, "Minecraft", games_collection
+    )
+
+    second_result = buyGame(
+        second_buyer,
+        users,
+        games,
+        "Minecraft",
+        games_collection
+    )
+
+    assert first_result is True
+    assert second_result is True
+
+    assert buyer.get_credit() == 75.00
+    assert second_buyer.get_credit() == 75.00
+    assert seller.get_credit() == 100.00
+
+    assert ("Minecraft", "buyeruser") in games_collection
+    assert ("Minecraft", "secondbuyer") in games_collection
+
+    assert len(games_collection) == 2
+    assert len(games) == 1
+
+
+def test_buy_game_no_current_user(buy_data):
+    """Tests purchasing without a current user."""
+
+    buyer, seller, users, games, games_collection = buy_data
+
+    result = buyGame(
+        None, users, games, "Minecraft", games_collection
+    )
+
+    assert result is False
+    assert buyer.get_credit() == 100.00
+    assert seller.get_credit() == 50.00
+    assert games_collection == []
+
+
+def test_buy_game_exact_credit(buy_data):
+    """Tests a buyer whose credit exactly matches the game price."""
+
+    buyer, seller, users, games, games_collection = buy_data
+
+    buyer.deduct_credit(75.00)
+
+    result = buyGame(
+        buyer, users, games, "Minecraft", games_collection
+    )
+
+    assert result is True
+    assert buyer.get_credit() == 0.00
+    assert seller.get_credit() == 75.00
+    assert ("Minecraft", "buyeruser") in games_collection
+    assert len(games) == 1
