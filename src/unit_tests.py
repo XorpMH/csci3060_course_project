@@ -1,24 +1,136 @@
 from src.user import User
-from src.backend import addCredit, sellGame  
+from src.backend import createUser, deleteUser, addCredit, sellGame, findUser
 from src import file_handler
 
-def runTests():
-    """
-    TODO: ADD DESCRIPTION
-    TODO: run all test functions and output results
-    """
+# pip install -U pytest
+# python -m pytest src/unit_tests.py
 
-def testCreateUser():
+def testCreateUser_NotLoggedIn():
     """
-    TODO: ADD DESCRIPTION
-    TODO: Write tests
+    Test that if user is not logged in, the transaction rejects
     """
+    users = []
+    
+    result = createUser(None, users, "newuser", "FS")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+def testCreateUser_AdminOrAccountManagerReq():
+    """
+    Test that only AA and AM account types can create a user
+    AA: Admin
+    AM: Account Manager
+    """
+    # Admin
+    current_user = User("adminuser", "AA", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "FS")
+
+    assert result is True
+    assert findUser(users, "newuser") is not None
+
+    # Account Manager
+    current_user = User("accountmanager", "AM", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "FS")
+
+    assert result is True
+    assert findUser(users, "newuser") is not None
+
+    # Full Standard
+    current_user = User("normaluser", "FS", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "FS")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+    # Buy Standard
+    current_user = User("buyuser", "BS", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "FS")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+    # Sell Standard
+    current_user = User("buyuser", "SS", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "FS")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+def testCreateUser_InvalidType():
+    """
+    Test that user cannot be created with a type that doesn't exist in the system
+    """
+    current_user = User("accountmanager", "AM", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+def testCreateUser_AMCannotCreateAA():
+    """
+    Test that an account manager cannot create an admin user (privilege escalation)
+    """
+    current_user = User("accountmanager", "AM", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "newuser", "AA")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+def testCreateUser_UsernameLength():
+    """
+    Test that the username must be between 1 and 15 characters
+    """
+    # Username over 15 characters
+    current_user = User("accountmanager", "AM", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "1234567890123456", "FS")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+    # Username empty
+    current_user = User("accountmanager", "AM", 0.00)
+    users = [current_user]
+    
+    result = createUser(current_user, users, "", "FS")
+
+    assert result is False
+    assert findUser(users, "newuser") is None
+
+def testCreateUser_Unique():
+    """
+    Test that the username of the created user cannot be one that already exists
+    """
+    current_user = User("accountmanager", "AM", 0.00)
+    existing_user = User("existinguser", "FS", 0.00)
+    users = [current_user, existing_user]
+    
+    result = createUser(current_user, users, "existinguser", "FS")
+
+    assert result is False
 
 def testDeleteUser():
     """
     TODO: ADD DESCRIPTION
     TODO: Write tests
     """
+    
 
 def testAddCreditLoggedIn():
     # Test that adding credit requires a logged-in user
