@@ -290,6 +290,18 @@ def testSellGameExceedNameLength():
     assert result is False
     assert len(games) == 0
 
+def testSellGameNegativePrice():
+    """ 
+    Test that selling a game with a negative price is rejected
+    """
+    seller = User("selleruser", "FS", 100.00)
+    games = []      
+
+    result = sellGame(seller, games, "New Game", -10.00)
+
+    assert result is False
+    assert len(games) == 0
+
 def testBuyGame():
     """
     TODO: ADD DESCRIPTION
