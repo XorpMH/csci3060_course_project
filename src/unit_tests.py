@@ -20,7 +20,7 @@ def testDeleteUser():
     TODO: Write tests
     """
 
-def testAddCredit():
+def testAddCreditLoggedIn():
     # Test that adding credit requires a logged-in user
     users = []
     
@@ -104,11 +104,55 @@ def testAddCreditManager():
     assert result is True
     assert target.get_credit() == 150.00
 
-def testSellGame():
-    """
-    TODO: ADD DESCRIPTION
-    TODO: Write tests
-    """
+def testSellGameLoggedIn():
+    # Test that selling a game requires a logged-in user
+    games = []
+
+    result = sellGame(None, games, "New Game", 20.00)
+
+    assert result is False
+    assert len(games) == 0
+
+def testSellGameAccountManager():
+    # Test that account managers cannot sell games
+    manager = User("manageruser", "AM", 100.00)
+    games = []
+
+    result = sellGame(manager, games, "New Game", 20.00)
+
+    assert result is False
+    assert len(games) == 0
+
+def testSellGameBuyStandard():
+    # Test that a standard buyer cannot sell games
+    buyer = User("buyeruser", "BS", 100.00)
+    games = []
+
+    result = sellGame(buyer, games, "New Game", 20.00)
+
+    assert result is False
+    assert len(games) == 0
+
+def testSellGameEmptyName():
+    # Test that selling a game with an empty name is rejected
+    seller = User("selleruser", "FS", 100.00)
+    games = []
+
+    result = sellGame(seller, games, "", 20.00)
+
+    assert result is False
+    assert len(games) == 0
+
+def testSellGameExceedNameLength():
+    # Test that selling a game with a name exceeding 25 characters is rejected
+    seller = User("selleruser", "FS", 100.00)
+    games = []
+
+    long_name = "A" * 27  # 27 characters
+    result = sellGame(seller, games, long_name, 20.00)
+
+    assert result is False
+    assert len(games) == 0
 
 def testBuyGame():
     """
