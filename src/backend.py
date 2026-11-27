@@ -459,12 +459,10 @@ def sellGame(current_user, games, game_name, price):
     return True
 
 
-def buyGame(current_user, users, games, game_name):
+def buyGame(current_user, users, games, game_name, games_collection):
     """
-    Purchases an available game.
-
-    AM users cannot buy games.
-    SS users cannot buy games.
+    Purchases an available game and updates the buyer's game collection.
+    AM and SS users cannot buy games.
     """
 
     # Current user must exist
@@ -473,25 +471,26 @@ def buyGame(current_user, users, games, game_name):
 
     user_type = current_user.get_user_type()
 
-    # Account Manager cannot buy
-    if user_type == "AM":
+    # Check buyer permissions
+    if user_type in ["AM", "SS"]:
         return False
 
-    # Sell-standard users cannot buy
-    if user_type == "SS":
-        return False
-
-    game = findGame(games,game_name)
+    game = findGame(games, game_name)
 
     # Game must exist
     if game is None:
         return False
 
+    buyer_name = current_user.get_username()
+
     # Seller cannot buy their own game
-    if (
-        game.get_seller()
-        == current_user.get_username()
-    ):
+    if game.get_seller() == buyer_name:
+        return False
+
+    # Buyer cannot purchase a game they already own
+    ownership = (game_name, buyer_name)
+
+    if ownership in games_collection:
         return False
 
     price = game.get_price()
@@ -500,7 +499,7 @@ def buyGame(current_user, users, games, game_name):
     if current_user.get_credit() < price:
         return False
 
-    seller = findUser(users,game.get_seller())
+    seller = findUser(users, game.get_seller())
 
     # Seller must exist
     if seller is None:
@@ -513,42 +512,71 @@ def buyGame(current_user, users, games, game_name):
     # Give money to seller
     seller.add_credit(price)
 
-    # Remove purchased game from available games
-    games.remove(game)
+    # Add game to the buyer's collection
+    games_collection.append(ownership)
 
     return True
 
 
-def refundGame(users, buyer_name, seller_name, amount):
+def refundGame(users, buyer_name, seller_name, amount,
+               games, games_collection):
     """
-    Refunds money from the seller to the buyer.
+    Refunds credit from the seller to the buyer and removes
+    the matching game from the buyer's collection.
     """
 
-    # Cannot refund negative credit
+    # Refund amount must be positive
     if amount <= 0:
         return False
 
-    buyer = findUser(users,buyer_name)
-    seller = findUser(users,seller_name)
+    buyer = findUser(users, buyer_name)
+    seller = findUser(users, seller_name)
 
-    # Buyer must exist
+    # Both users must exist
     if buyer is None:
         return False
 
-    # Seller must exist
     if seller is None:
+        return False
+
+    # Buyer and seller cannot be the same user
+    if buyer_name == seller_name:
         return False
 
     # Seller must have enough credit
     if seller.get_credit() < amount:
         return False
 
+    # Find games matching the seller, price and ownership
+    matching_games = []
+
+    for game in games:
+        ownership = (game.get_name(), buyer_name)
+
+        if (
+            game.get_seller() == seller_name
+            and round(game.get_price(), 2) == round(amount, 2)
+            and ownership in games_collection
+        ):
+            matching_games.append(game)
+
+    # Exactly one game must match the refund
+    if len(matching_games) != 1:
+        return False
+
+    refunded_game = matching_games[0]
+
     # Deduct credit from seller
     if not seller.deduct_credit(amount):
         return False
 
-    # Add credit to the buyer if credit deduction works
+    # Return credit to buyer
     buyer.add_credit(amount)
+
+    # Remove the refunded game from the buyer's collection
+    games_collection.remove(
+        (refunded_game.get_name(), buyer_name)
+    )
 
     return True
 
@@ -703,7 +731,7 @@ def applyTransaction(
                 data["price"]
             )
 
-        # Buy game
+                # Buy game
         case "04":
             buyer = findUser(
                 users,
@@ -714,7 +742,8 @@ def applyTransaction(
                 buyer,
                 users,
                 games,
-                data["game"]
+                data["game"],
+                games_collection
             )
 
         # Refund
@@ -723,7 +752,9 @@ def applyTransaction(
                 users,
                 data["buyer"],
                 data["seller"],
-                data["credit"]
+                data["credit"],
+                games,
+                games_collection
             )
 
         # Add credit

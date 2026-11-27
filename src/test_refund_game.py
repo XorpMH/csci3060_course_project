@@ -1,168 +1,275 @@
+import pytest
+
 from src.backend import refundGame
 from src.user import User
-from src.shared_tests import create_test_users
+from src.game import Game
 
 
-def test_refund_game_success():
-    """
-    A valid refund should transfer credit from seller to buyer.
-    """
+@pytest.fixture
+def refund_data():
+    """Creates fresh user, game and collection data for each test."""
 
-    buyer, seller, _, _, _ = create_test_users()
+    buyer = User("buyeruser", "FS", 75.00)
+    seller = User("selleruser", "FS", 75.00)
 
-    users = [
-        buyer,
-        seller
+    users = [buyer, seller]
+
+    game = Game("Minecraft", "selleruser", 25.00)
+
+    games = [game]
+
+    games_collection = [
+        ("Minecraft", "buyeruser")
     ]
+
+    return buyer, seller, users, games, games_collection
+
+
+def test_refund_game_success(refund_data):
+    """Tests a successful refund and ownership removal."""
+
+    buyer, seller, users, games, games_collection = refund_data
+
+    games_collection.append(("Terraria", "buyeruser"))
+    games_collection.append(("Minecraft", "otherbuyer"))
 
     result = refundGame(
         users,
         "buyeruser",
         "selleruser",
-        25.00
+        25.00,
+        games,
+        games_collection
     )
 
     assert result is True
+    assert buyer.get_credit() == 100.00
+    assert seller.get_credit() == 50.00
 
-    # Buyer starts with 100 and receives 25
-    assert buyer.get_credit() == 125.00
+    assert ("Minecraft", "buyeruser") not in games_collection
 
-    # Seller starts with 50 and refunds 25
-    assert seller.get_credit() == 25.00
+    assert ("Terraria", "buyeruser") in games_collection
+    assert ("Minecraft", "otherbuyer") in games_collection
+
+    assert len(games_collection) == 2
+    assert len(games) == 1
 
 
-def test_refund_game_missing_buyer():
-    """
-    Refund should fail if the buyer does not exist.
-    """
+def test_refund_game_missing_buyer(refund_data):
+    """Tests a refund when the buyer does not exist."""
 
-    seller = User(
-        "selleruser",
-        "FS",
-        50.00
-    )
-
-    users = [
-        seller
-    ]
+    buyer, seller, users, games, games_collection = refund_data
 
     result = refundGame(
         users,
         "missingbuyer",
         "selleruser",
-        25.00
+        25.00,
+        games,
+        games_collection
     )
 
     assert result is False
-    assert seller.get_credit() == 50.00
+    assert seller.get_credit() == 75.00
+    assert ("Minecraft", "buyeruser") in games_collection
 
 
-def test_refund_game_missing_seller():
-    """
-    Refund should fail if the seller does not exist.
-    """
+def test_refund_game_missing_seller(refund_data):
+    """Tests a refund when the seller does not exist."""
 
-    buyer = User(
-        "buyeruser",
-        "FS",
-        100.00
-    )
-
-    users = [
-        buyer
-    ]
+    buyer, seller, users, games, games_collection = refund_data
 
     result = refundGame(
         users,
         "buyeruser",
         "missingseller",
-        25.00
+        25.00,
+        games,
+        games_collection
     )
 
     assert result is False
-    assert buyer.get_credit() == 100.00
+    assert buyer.get_credit() == 75.00
+    assert ("Minecraft", "buyeruser") in games_collection
 
 
-def test_refund_game_zero_amount():
-    """
-    A refund amount of zero should be rejected.
-    """
+@pytest.mark.parametrize("amount", [0.00, -10.00])
+def test_refund_game_invalid_amount(refund_data, amount):
+    """Tests zero and negative refund amounts."""
 
-    buyer, seller, _, _, _ = create_test_users()
-
-    users = [
-        buyer,
-        seller
-    ]
+    buyer, seller, users, games, games_collection = refund_data
 
     result = refundGame(
         users,
         "buyeruser",
         "selleruser",
-        0.00
+        amount,
+        games,
+        games_collection
     )
 
     assert result is False
+    assert buyer.get_credit() == 75.00
+    assert seller.get_credit() == 75.00
+    assert ("Minecraft", "buyeruser") in games_collection
 
-    assert buyer.get_credit() == 100.00
-    assert seller.get_credit() == 50.00
 
+def test_refund_game_insufficient_seller_credit(refund_data):
+    """Tests a seller with insufficient credit for a refund."""
 
-def test_refund_game_negative_amount():
-    """
-    A negative refund amount should be rejected.
-    """
+    buyer, seller, users, games, games_collection = refund_data
 
-    buyer, seller, _, _, _ = create_test_users()
-
-    users = [
-        buyer,
-        seller
-    ]
+    seller.deduct_credit(65.00)
 
     result = refundGame(
         users,
         "buyeruser",
         "selleruser",
-        -10.00
+        25.00,
+        games,
+        games_collection
     )
 
     assert result is False
-
-    assert buyer.get_credit() == 100.00
-    assert seller.get_credit() == 50.00
-
-
-def test_refund_game_insufficient_seller_credit():
-    """
-    Refund should fail when the seller does not have enough credit.
-    """
-
-    buyer = User(
-        "buyeruser",
-        "FS",
-        100.00
-    )
-
-    seller = User(
-        "selleruser",
-        "FS",
-        10.00
-    )
-
-    users = [
-        buyer,
-        seller
-    ]
-
-    result = refundGame(
-        users,
-        "buyeruser",
-        "selleruser",
-        25.00
-    )
-
-    assert result is False
-
-    assert buyer.get_credit() == 100.00
+    assert buyer.get_credit() == 75.00
     assert seller.get_credit() == 10.00
+    assert ("Minecraft", "buyeruser") in games_collection
+
+
+def test_refund_game_not_owned(refund_data):
+    """Tests refunding a game that the buyer does not own."""
+
+    buyer, seller, users, games, games_collection = refund_data
+
+    games_collection.clear()
+
+    result = refundGame(
+        users,
+        "buyeruser",
+        "selleruser",
+        25.00,
+        games,
+        games_collection
+    )
+
+    assert result is False
+    assert buyer.get_credit() == 75.00
+    assert seller.get_credit() == 75.00
+    assert games_collection == []
+
+
+def test_refund_game_price_mismatch(refund_data):
+    """Tests a refund amount that does not match the game price."""
+
+    buyer, seller, users, games, games_collection = refund_data
+
+    result = refundGame(
+        users,
+        "buyeruser",
+        "selleruser",
+        20.00,
+        games,
+        games_collection
+    )
+
+    assert result is False
+    assert buyer.get_credit() == 75.00
+    assert seller.get_credit() == 75.00
+    assert ("Minecraft", "buyeruser") in games_collection
+
+
+def test_refund_game_multiple_matches(refund_data):
+    """Tests an ambiguous refund involving games with the same price."""
+
+    buyer, seller, users, games, games_collection = refund_data
+
+    second_game = Game("Terraria", "selleruser", 25.00)
+
+    games.append(second_game)
+
+    games_collection.append(("Terraria", "buyeruser"))
+
+    result = refundGame(
+        users,
+        "buyeruser",
+        "selleruser",
+        25.00,
+        games,
+        games_collection
+    )
+
+    assert result is False
+    assert buyer.get_credit() == 75.00
+    assert seller.get_credit() == 75.00
+
+    assert ("Minecraft", "buyeruser") in games_collection
+    assert ("Terraria", "buyeruser") in games_collection
+    assert len(games_collection) == 2
+
+
+def test_refund_game_wrong_seller(refund_data):
+    """Tests a refund requested from the wrong seller."""
+
+    buyer, seller, users, games, games_collection = refund_data
+
+    other_seller = User("otherseller", "FS", 100.00)
+
+    users.append(other_seller)
+
+    result = refundGame(
+        users,
+        "buyeruser",
+        "otherseller",
+        25.00,
+        games,
+        games_collection
+    )
+
+    assert result is False
+    assert buyer.get_credit() == 75.00
+    assert seller.get_credit() == 75.00
+    assert other_seller.get_credit() == 100.00
+
+    assert ("Minecraft", "buyeruser") in games_collection
+
+
+def test_refund_game_exact_seller_credit(refund_data):
+    """Tests a seller whose credit exactly matches the refund amount."""
+
+    buyer, seller, users, games, games_collection = refund_data
+
+    seller.deduct_credit(50.00)
+
+    result = refundGame(
+        users,
+        "buyeruser",
+        "selleruser",
+        25.00,
+        games,
+        games_collection
+    )
+
+    assert result is True
+    assert buyer.get_credit() == 100.00
+    assert seller.get_credit() == 0.00
+    assert ("Minecraft", "buyeruser") not in games_collection
+
+
+def test_refund_game_same_user(refund_data):
+    """Tests a refund where the buyer and seller are the same user."""
+
+    buyer, seller, users, games, games_collection = refund_data
+
+    result = refundGame(
+        users,
+        "buyeruser",
+        "buyeruser",
+        25.00,
+        games,
+        games_collection
+    )
+
+    assert result is False
+    assert buyer.get_credit() == 75.00
+    assert seller.get_credit() == 75.00
+    assert ("Minecraft", "buyeruser") in games_collection
