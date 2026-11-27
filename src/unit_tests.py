@@ -28,6 +28,7 @@ def testAddCredit():
 
     assert result is False
 
+def testAddCreditZero():
     # Test that adding zero credit is rejected.
 
     admin = User("adminuser", "AA", 500.00)
@@ -39,6 +40,7 @@ def testAddCredit():
 
     assert result is False
 
+def testAddCreditNegative():
     # Test that negative credit amounts are rejected.
 
     admin = User("adminuser", "AA", 500.00)
@@ -51,6 +53,7 @@ def testAddCredit():
     assert result is False
     assert target.get_credit() == 100.00
 
+def testAddCreditSuccess():
     # Test that an admin can successfully add credit.
 
     admin = User("adminuser", "AA", 500.00)
@@ -63,7 +66,8 @@ def testAddCredit():
     assert result is True
     assert target.get_credit() == 150.00
 
-        # Test that unauthorized users cannot add credit
+def testAddCreditUnauthorized():
+    # Test that unauthorized users cannot add credit
 
     buyer = User("buyeruser", "BS", 100.00)
     target = User("existinguser", "FS", 100.00)
@@ -75,7 +79,8 @@ def testAddCredit():
     assert result is False
     assert target.get_credit() == 100.00
 
-        # Test that credit cannot be added to a nonexistent user
+def testAddCreditMissingUser():
+    # Test that credit cannot be added to a nonexistent user
 
     admin = User("adminuser", "AA", 500.00)
 
@@ -86,7 +91,8 @@ def testAddCredit():
     assert result is False
     assert admin.get_credit() == 500.00
 
-        # Test that an account manager can successfully add credit
+def testAddCreditManager():
+    # Test that an account manager can successfully add credit
 
     manager = User("manageruser", "AM", 500.00)
     target = User("existinguser", "FS", 100.00)
