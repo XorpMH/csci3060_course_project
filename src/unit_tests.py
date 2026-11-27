@@ -133,7 +133,9 @@ def testDeleteUser():
     
 
 def testAddCreditLoggedIn():
-    # Test that adding credit requires a logged-in user
+    """
+    Test that adding credit requires a logged-in user
+    """
     users = []
     
     result = addCredit(None, users, "existinguser", 50)
@@ -141,8 +143,9 @@ def testAddCreditLoggedIn():
     assert result is False
 
 def testAddCreditZero():
-    # Test that adding zero credit is rejected.
-
+    """
+    Test that adding zero credit is rejected
+    """
     admin = User("adminuser", "AA", 500.00)
     target = User("existinguser", "FS", 100.00)
 
@@ -153,8 +156,9 @@ def testAddCreditZero():
     assert result is False
 
 def testAddCreditNegative():
-    # Test that negative credit amounts are rejected.
-
+    """
+    Test that negative credit amounts are rejected
+    """
     admin = User("adminuser", "AA", 500.00)
     target = User("existinguser", "FS", 100.00)
 
@@ -166,8 +170,9 @@ def testAddCreditNegative():
     assert target.get_credit() == 100.00
 
 def testAddCreditSuccess():
-    # Test that an admin can successfully add credit.
-
+    """
+    Test that an admin can successfully add credit
+    """
     admin = User("adminuser", "AA", 500.00)
     target = User("existinguser", "FS", 100.00)
 
@@ -179,8 +184,9 @@ def testAddCreditSuccess():
     assert target.get_credit() == 150.00
 
 def testAddCreditUnauthorized():
-    # Test that unauthorized users cannot add credit
-
+    """
+    Test that unauthorized users cannot add credit
+    """
     buyer = User("buyeruser", "BS", 100.00)
     target = User("existinguser", "FS", 100.00)
 
@@ -192,8 +198,9 @@ def testAddCreditUnauthorized():
     assert target.get_credit() == 100.00
 
 def testAddCreditMissingUser():
-    # Test that credit cannot be added to a nonexistent user
-
+    """
+    Test that credit cannot be added to a nonexistent user
+    """
     admin = User("adminuser", "AA", 500.00)
 
     users = [admin]
@@ -204,8 +211,9 @@ def testAddCreditMissingUser():
     assert admin.get_credit() == 500.00
 
 def testAddCreditManager():
-    # Test that an account manager can successfully add credit
-
+    """
+    Test that an account manager can successfully add credit
+    """
     manager = User("manageruser", "AM", 500.00)
     target = User("existinguser", "FS", 100.00)
 
@@ -217,7 +225,9 @@ def testAddCreditManager():
     assert target.get_credit() == 150.00
 
 def testSellGameLoggedIn():
-    # Test that selling a game requires a logged-in user
+    """
+    Test that selling a game requires a logged-in user
+    """
     games = []
 
     result = sellGame(None, games, "New Game", 20.00)
@@ -226,7 +236,9 @@ def testSellGameLoggedIn():
     assert len(games) == 0
 
 def testSellGameAccountManager():
-    # Test that account managers cannot sell games
+    """
+    Test that account managers cannot sell games
+    """
     manager = User("manageruser", "AM", 100.00)
     games = []
 
@@ -236,7 +248,9 @@ def testSellGameAccountManager():
     assert len(games) == 0
 
 def testSellGameBuyStandard():
-    # Test that a standard buyer cannot sell games
+    """
+    Test that a standard buyer cannot sell games
+    """
     buyer = User("buyeruser", "BS", 100.00)
     games = []
 
@@ -246,7 +260,9 @@ def testSellGameBuyStandard():
     assert len(games) == 0
 
 def testSellGameEmptyName():
-    # Test that selling a game with an empty name is rejected
+    """
+    Test that selling a game with an empty name is rejected
+    """
     seller = User("selleruser", "FS", 100.00)
     games = []
 
@@ -256,7 +272,9 @@ def testSellGameEmptyName():
     assert len(games) == 0
 
 def testSellGameExceedNameLength():
-    # Test that selling a game with a name exceeding 25 characters is rejected
+    """
+    Test that selling a game with a name exceeding 25 characters is rejected
+    """
     seller = User("selleruser", "FS", 100.00)
     games = []
 
