@@ -130,7 +130,6 @@ def testDeleteUser():
     TODO: ADD DESCRIPTION
     TODO: Write tests
     """
-    
 
 def testAddCreditLoggedIn():
     """
@@ -280,6 +279,18 @@ def testSellGameExceedNameLength():
 
     long_name = "A" * 27  # 27 characters
     result = sellGame(seller, games, long_name, 20.00)
+
+    assert result is False
+    assert len(games) == 0
+
+def testSellGameNegativePrice():
+    """ 
+    Test that selling a game with a negative price is rejected
+    """
+    seller = User("selleruser", "FS", 100.00)
+    games = []      
+
+    result = sellGame(seller, games, "New Game", -10.00)
 
     assert result is False
     assert len(games) == 0
